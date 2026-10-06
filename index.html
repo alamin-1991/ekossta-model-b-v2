@@ -3,7 +3,7 @@
 <body>
 <header class="mobile-topbar">
   <div><b>e-KOSSTA</b><small id="mobilePageTitle">Dashboard</small></div>
-  <button id="themeBtn">🌙</button>
+  <button id="themeBtn" class="icon-btn theme-toggle" type="button" aria-label="Tukar tema" title="Tukar tema"></button>
 </header>
 <aside id="sidebar" class="sidebar" aria-label="Navigasi utama">
   <div class="brand">
@@ -71,7 +71,7 @@
   </nav>
 
   <div class="sidebar-bottom">
-    <button id="sidebarThemeBtn" class="nav-item" type="button">
+    <button id="sidebarThemeBtn" class="nav-item theme-toggle" type="button" aria-label="Tukar tema" title="Tukar tema">
       <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       <span>Tukar Tema</span>
     </button>
@@ -85,7 +85,7 @@
 <main class="app-shell">
   <div class="desktop-topbar">
     <div><span class="breadcrumb">e-KOSSTA</span><strong id="desktopPageTitle">Dashboard</strong></div>
-    <div class="top-actions"><span id="desktopUser" class="user-chip">-</span><button id="desktopThemeBtn" class="icon-btn" type="button">🌙</button><button id="logoutBtn" class="btn secondary">Log Keluar</button></div>
+    <div class="top-actions"><span id="desktopUser" class="user-chip">-</span><button id="desktopThemeBtn" class="icon-btn theme-toggle" type="button" aria-label="Tukar tema" title="Tukar tema"></button></div>
   </div>
 <div class="container">
 <section id="loginView" class="card login-card"><span>e-KOSSTA • MODEL B</span><h1>Log Masuk</h1><p class="muted">Ujian session + role authorization menggunakan data ujian sahaja.</p><label>Username</label><input id="username" autocomplete="username" placeholder="admin atau guru"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password ujian"><button id="loginBtn" class="btn primary full">Log Masuk</button><div class="demo"><b>Akaun ujian</b><br>ADMIN: admin / admin123<br>GURU: guru / guru123</div><div id="loginResult" class="result muted"></div></section>

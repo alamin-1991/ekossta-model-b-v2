@@ -236,3 +236,33 @@ body.logged-out #loginView{
 .nav-section-label{font-size:9px;letter-spacing:.12em;color:#777684;font-weight:800;padding:16px 11px 6px;border-top:1px solid rgba(255,255,255,.06);margin-top:5px;}
 .nav-subitem{padding-left:11px;}
 .nav-subitem .nav-icon{width:17px;height:17px;flex-basis:17px;}
+
+/* UI PATCH: theme-aware controls + minimalist theme icons */
+select{
+  width:100%;
+  min-height:42px;
+  padding:10px 38px 10px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background-color:var(--surface2);
+  color:var(--text);
+  color-scheme:light;
+  outline:none;
+  cursor:pointer;
+  font:inherit;
+}
+html.dark select{color-scheme:dark}
+select:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 16%,transparent)}
+select:hover{border-color:color-mix(in srgb,var(--primary) 45%,var(--border))}
+option{background:var(--surface2);color:var(--text)}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.theme-icon{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#sidebarThemeBtn .theme-icon{width:17px;height:17px}
+.desktop-topbar .theme-toggle{width:40px;height:40px;padding:0}
+.mobile-topbar .theme-toggle{width:38px;height:38px;padding:0}
+/* Future filter controls: same light/dark token system */
+.filter-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.filter-bar select,.filter-select{width:auto;min-width:150px}
+.filter-btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 13px;font-weight:700;cursor:pointer}
+.filter-btn:hover,.filter-btn.active{border-color:var(--primary);color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,var(--surface2))}
+html.dark .filter-btn:hover,html.dark .filter-btn.active{color:#b8a9ff}

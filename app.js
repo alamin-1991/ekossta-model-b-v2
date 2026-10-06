@@ -87,11 +87,9 @@ function showPage(page){
 }
 
 function init(){
-  if(state.dark){
-    document.documentElement.classList.add('dark');
-    ['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{if($(id))$(id).textContent='☀️'});
-  }
+  document.documentElement.classList.toggle('dark',state.dark);
   setupNavigation();
+  setThemeIcons_();
   const bind=(id,event,fn)=>{const e=$(id);if(e)e.addEventListener(event,fn)};
   bind('themeBtn','click',toggleTheme);
   bind('loginBtn','click',login);
@@ -356,6 +354,19 @@ function showApp(){
     loadGuru();
   }
 }
-function toggleTheme(){state.dark=!state.dark;document.documentElement.classList.toggle('dark',state.dark);localStorage.setItem('ekossta_model_b_dark',state.dark?'1':'0');['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{const e=$(id);if(e)e.textContent=state.dark?'☀️':'🌙'})}
+function themeIconMarkup_(isDark){
+  return isDark
+    ? '<svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>'
+    : '<svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"></path></svg>';
+}
+function setThemeIcons_(){
+  ['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{const e=$(id);if(e)e.innerHTML=themeIconMarkup_(state.dark)});
+}
+function toggleTheme(){
+  state.dark=!state.dark;
+  document.documentElement.classList.toggle('dark',state.dark);
+  localStorage.setItem('ekossta_model_b_dark',state.dark?'1':'0');
+  setThemeIcons_();
+}
 function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),3200)}
 document.addEventListener('DOMContentLoaded',init);
