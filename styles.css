@@ -336,3 +336,76 @@ body.mobile-menu-open{overflow:hidden}
   .nav-group.desktop-popup-open > .nav-submenu .nav-group.open > .nav-submenu{display:block;}
   .nav-group.desktop-popup-open > .nav-submenu .nav-group.open > .nav-group-toggle .nav-chevron{transform:rotate(90deg);}
 }
+
+/* =========================================================
+   V2.3 NAVIGATION POLISH — TEXT-ONLY SUBMENUS
+   ========================================================= */
+@media(min-width:769px){
+  /* Popup submenu: text sahaja, tanpa ikon */
+  .nav-group.desktop-popup-open > .nav-submenu .nav-icon,
+  .nav-group.desktop-popup-open > .nav-submenu .nav-icon-spacer{
+    display:none !important;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:38px;
+    padding:9px 11px;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-item span:last-child{
+    margin-left:0;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-group-left{
+    display:block;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-group-left .nav-icon{
+    display:none !important;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-group-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+}
+
+@media(max-width:768px){
+  /* Mobile: popup/drawer submenu juga menggunakan teks sahaja */
+  .mobile-main-link,
+  .mobile-group-toggle,
+  .mobile-menu-item{
+    min-height:44px;
+  }
+  .mobile-group-toggle span,
+  .mobile-main-link b{
+    display:block;
+  }
+  .mobile-group-toggle > b{
+    font-size:20px;
+  }
+  .mobile-group-items{
+    padding:3px 8px 8px;
+  }
+  .mobile-menu-item{
+    padding:11px 12px;
+    min-height:42px;
+  }
+  .mobile-menu-item.nested{
+    padding-left:20px;
+  }
+  .mobile-nested-group{
+    margin:4px 0 2px;
+    border:1px solid var(--border);
+    background:transparent;
+    border-radius:10px;
+  }
+  .mobile-nested-toggle{
+    padding:11px 12px;
+    font-size:12px;
+    font-weight:700;
+  }
+  .mobile-nested-group .mobile-group-items{
+    padding-left:5px;
+  }
+}

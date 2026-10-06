@@ -100,8 +100,8 @@ function setupMobileMenu_(){
   const content=$('mobileMenuContent');
   if(!mobileNav||!drawer||!content)return;
 
-  const openMenu=()=>{
-    buildMobileMenu_();
+  const openMenu=(preferredGroup='')=>{
+    buildMobileMenu_(preferredGroup);
     drawer.hidden=false;
     drawer.setAttribute('aria-hidden','false');
     document.body.classList.add('mobile-menu-open');
@@ -114,7 +114,7 @@ function setupMobileMenu_(){
     setTimeout(()=>{drawer.hidden=true;},180);
   };
 
-  mobileNav.querySelectorAll('[data-mobile-open-group]').forEach(btn=>btn.addEventListener('click',()=>openMenu()));
+  mobileNav.querySelectorAll('[data-mobile-open-group]').forEach(btn=>btn.addEventListener('click',()=>openMenu(btn.dataset.mobileOpenGroup)));
   mobileNav.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.page)));
   drawer.querySelectorAll('[data-mobile-close]').forEach(el=>el.addEventListener('click',closeMenu));
   drawer.addEventListener('click',e=>{
@@ -138,32 +138,75 @@ function setupMobileMenu_(){
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closeMenu();});
 }
 
-function buildMobileMenu_(){
+function buildMobileMenu_(preferredGroup=''){
   const content=$('mobileMenuContent');
   if(!content)return;
   const role=state.user?.role||'';
   const activePage=document.querySelector('.nav-item.active')?.dataset.page||'dashboard';
   const canAdmin=role==='ADMIN';
+
   const groups=[
-    {key:'kokurikulum',label:'Kokurikulum',icon:'◫',items:[
-      ['unit','Unit Kokurikulum',''],['penempatan','Penempatan Unit',''],['kehadiran','Kehadiran','V2.4'],['aktiviti','Aktiviti & Acara','V2.5'],['peserta','Peserta Aktiviti',''],['pencapaian','Pencapaian','V2.6']
+    {key:'kokurikulum',label:'Kokurikulum',items:[
+      ['unit','Unit Kokurikulum',''],
+      ['penempatan','Penempatan Unit',''],
+      ['kehadiran','Kehadiran','V2.4'],
+      ['aktiviti','Aktiviti & Acara','V2.5'],
+      ['peserta','Peserta Aktiviti',''],
+      ['pencapaian','Pencapaian','V2.6']
     ]},
-    {key:'laporan',label:'Laporan',icon:'▤',items:[['reports','Laporan Aktiviti',''],['galeri','Galeri','']]},
-    {key:'tetapan',label:'Tetapan',icon:'≡',items:[['system-settings','Tetapan Sistem',''],['guru','Guru',''],['murid','Murid',''],['users','Pengurusan Pengguna','']]}
+    {key:'laporan',label:'Laporan',items:[
+      ['reports','Laporan Aktiviti',''],
+      ['galeri','Galeri','']
+    ]},
+    {key:'tetapan',label:'Tetapan',items:[
+      ['system-settings','Tetapan Sistem',''],
+      ['guru','Guru',''],
+      ['murid','Murid',''],
+      ['users','Pengurusan Pengguna','']
+    ]}
   ];
+
   const allowed=page=>{
     if(['guru','users','system-settings'].includes(page))return canAdmin;
     return ['unit','penempatan','murid','reports'].includes(page);
   };
   const isDisabled=page=>!allowed(page)||['kehadiran','aktiviti','peserta','pencapaian','galeri'].includes(page);
-  content.innerHTML=`<button class="mobile-main-link ${activePage==='dashboard'?'active':''}" data-mobile-page="dashboard"><span>⌂</span><b>Dashboard</b></button>`+
-    groups.map(g=>`<div class="mobile-menu-group ${g.items.some(x=>x[0]===activePage)?'open':''}">
-      <button class="mobile-group-toggle" type="button" aria-expanded="${g.items.some(x=>x[0]===activePage)?'true':'false'}"><span><i>${g.icon}</i>${g.label}</span><b>›</b></button>
-      <div class="mobile-group-items">${g.items.map(([page,label,badge])=>{
-        const disabled=isDisabled(page);
-        return `<button class="mobile-menu-item ${activePage===page?'active':''} ${disabled?'disabled':''}" data-mobile-page="${page}" type="button" ${disabled?'disabled':''}><span>${label}</span>${badge?`<em>${badge}</em>`:''}</button>`;
-      }).join('')}</div>
-    </div>`).join('');
+
+  const groupIsOpen=g=>{
+    if(preferredGroup && g.key===preferredGroup)return true;
+    return g.items.some(x=>x[0]===activePage);
+  };
+
+  const renderItems=(items,indent=0)=>items.map(([page,label,badge])=>{
+    const disabled=isDisabled(page);
+    return `<button class="mobile-menu-item ${activePage===page?'active':''} ${disabled?'disabled':''} ${indent?'nested':''}" data-mobile-page="${page}" type="button" ${disabled?'disabled':''}><span>${label}</span>${badge?`<em>${badge}</em>`:''}</button>`;
+  }).join('');
+
+  content.innerHTML=`
+    <button class="mobile-main-link ${activePage==='dashboard'?'active':''}" data-mobile-page="dashboard" type="button">
+      <b>Dashboard</b>
+    </button>
+    ${groups.map(g=>{
+      const open=groupIsOpen(g);
+      if(g.key!=='tetapan'){
+        return `<div class="mobile-menu-group ${open?'open':''}">
+          <button class="mobile-group-toggle" type="button" aria-expanded="${open?'true':'false'}"><span>${g.label}</span><b>›</b></button>
+          <div class="mobile-group-items">${renderItems(g.items)}</div>
+        </div>`;
+      }
+      const settingsOpen=open;
+      return `<div class="mobile-menu-group ${settingsOpen?'open':''}">
+        <button class="mobile-group-toggle" type="button" aria-expanded="${settingsOpen?'true':'false'}"><span>${g.label}</span><b>›</b></button>
+        <div class="mobile-group-items">
+          ${renderItems([['system-settings','Tetapan Sistem','']])}
+          <div class="mobile-menu-group mobile-nested-group">
+            <button class="mobile-group-toggle mobile-nested-toggle" type="button" aria-expanded="${activePage==='guru'||activePage==='murid'?'true':'false'}"><span>Pengurusan Data</span><b>›</b></button>
+            <div class="mobile-group-items">${renderItems([['guru','Guru',''],['murid','Murid','']])}</div>
+          </div>
+          ${renderItems([['users','Pengurusan Pengguna','']])}
+        </div>
+      </div>`;
+    }).join('')}`;
 }
 
 function showPage(page){
