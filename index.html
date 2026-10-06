@@ -17,45 +17,57 @@
       <span>Dashboard</span>
     </button>
 
-    <div class="nav-section-label">PENGURUSAN DATA</div>
-    <button class="nav-item nav-subitem" data-page="murid" type="button">
-      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 9h5M16 13h5M16 17h5"/></svg>
-      <span>Murid</span>
-    </button>
-    <button class="nav-item nav-subitem" data-page="guru" type="button">
-      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
-      <span>Guru</span>
-    </button>
-    <button class="nav-item nav-subitem" data-page="unit" type="button">
-      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>
-      <span>Unit Kokurikulum</span>
-    </button>
-    <button class="nav-item nav-subitem" data-page="penempatan" type="button">
-      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14 18a4 4 0 0 1 7 0"/></svg>
-      <span>Penempatan Unit</span>
-    </button>
+    <div class="nav-group open">
+      <button class="nav-group-toggle" type="button" aria-expanded="true">
+        <span class="nav-group-left"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span>Kokurikulum</span></span>
+        <span class="nav-chevron">⌄</span>
+      </button>
+      <div class="nav-submenu">
+        <button class="nav-item nav-subitem" data-page="unit" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span>Unit Kokurikulum</span></button>
+        <button class="nav-item nav-subitem" data-page="penempatan" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14 18a4 4 0 0 1 7 0"/></svg><span>Penempatan Unit</span></button>
+        <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 3v4M18 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1z"/></svg><span>Kehadiran</span><em>V2.4</em></button>
+        <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Aktiviti &amp; Acara</span><em>V2.5</em></button>
+        <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M3 19a5 5 0 0 1 10 0M15 7h5M15 11h5M15 15h5"/></svg><span>Peserta Aktiviti</span></button>
+        <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8z"/></svg><span>Pencapaian</span><em>V2.6</em></button>
+      </div>
+    </div>
 
-    <div class="nav-section-label">KOKURIKULUM</div>
-    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 3v4M18 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1z"/></svg><span>Kehadiran</span><em>V2.4</em></button>
-    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Aktiviti &amp; Acara</span><em>V2.5</em></button>
-    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M3 19a5 5 0 0 1 10 0M15 7h5M15 11h5M15 15h5"/></svg><span>Peserta Aktiviti</span></button>
-    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8z"/></svg><span>Pencapaian</span><em>V2.6</em></button>
-    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h6M8 16h8"/></svg><span>Laporan Aktiviti</span></button>
-    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m6 16 4-4 3 3 2-2 3 3"/></svg><span>Galeri</span></button>
-
-    <div class="nav-section-label">ANALISIS &amp; SISTEM</div>
-    <button class="nav-item nav-subitem" data-page="analysis" type="button">
+    <button class="nav-item" data-page="analysis" type="button">
       <svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 19V9M12 19V5M19 19v-8"/></svg>
-      <span>Analisis Laporan</span>
+      <span>Analisis</span>
     </button>
-    <button class="nav-item nav-subitem admin-nav" data-page="users" type="button">
-      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 8h5M16 12h5M16 16h5"/></svg>
-      <span>Pengurusan Pengguna</span>
-    </button>
-    <button class="nav-item nav-subitem admin-nav" data-page="system-settings" type="button">
-      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/></svg>
-      <span>Tetapan Sistem</span>
-    </button>
+
+    <div class="nav-group">
+      <button class="nav-group-toggle" type="button" aria-expanded="false">
+        <span class="nav-group-left"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h6M8 16h8"/></svg><span>Laporan</span></span>
+        <span class="nav-chevron">⌄</span>
+      </button>
+      <div class="nav-submenu">
+        <button class="nav-item nav-subitem" data-page="reports" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h6M8 16h8"/></svg><span>Laporan Aktiviti</span></button>
+        <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m6 16 4-4 3 3 2-2 3 3"/></svg><span>Galeri</span></button>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button class="nav-group-toggle" type="button" aria-expanded="false">
+        <span class="nav-group-left"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/></svg><span>Tetapan</span></span>
+        <span class="nav-chevron">⌄</span>
+      </button>
+      <div class="nav-submenu">
+        <button class="nav-item nav-subitem admin-nav" data-page="system-settings" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/></svg><span>Tetapan Sistem</span></button>
+        <div class="nav-group nav-nested">
+          <button class="nav-group-toggle" type="button" aria-expanded="false">
+            <span class="nav-group-left"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 9h5M16 13h5M16 17h5"/></svg><span>Pengurusan Data</span></span>
+            <span class="nav-chevron">⌄</span>
+          </button>
+          <div class="nav-submenu">
+            <button class="nav-item nav-subitem admin-nav" data-page="guru" type="button"><span class="nav-icon-spacer"></span><span>Guru</span></button>
+            <button class="nav-item nav-subitem" data-page="murid" type="button"><span class="nav-icon-spacer"></span><span>Murid</span></button>
+          </div>
+        </div>
+        <button class="nav-item nav-subitem admin-nav" data-page="users" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 8h5M16 12h5M16 16h5"/></svg><span>Pengurusan Pengguna</span></button>
+      </div>
+    </div>
   </nav>
 
   <div class="sidebar-bottom">
@@ -145,6 +157,9 @@
     <h2>Analisis Laporan</h2>
     <p class="muted">Modul analisis akan dibina selepas modul laporan aktiviti siap.</p>
   </div>
+</section>
+<section id="reportsSection" class="card page-section page-reports" hidden>
+  <div class="empty-state-large"><div class="empty-icon minimal-icon">▤</div><h2>Laporan</h2><p class="muted">Modul laporan aktiviti akan dibina secara berperingkat.</p></div>
 </section>
 <section id="systemSettingsSection" class="card page-section page-system-settings" hidden>
   <div class="head"><div><h2>Tetapan Sistem</h2><small class="muted">ADMIN sahaja</small></div></div>

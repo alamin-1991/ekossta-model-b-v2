@@ -46,7 +46,8 @@ function showPage(page){
     unit:'Unit Kokurikulum',
     penempatan:'Penempatan Unit',
     users:'Pengurusan Pengguna',
-    analysis:'Analisis Laporan',
+    analysis:'Analisis',
+    reports:'Laporan Aktiviti',
     'system-settings':'Tetapan Sistem'
   };
 
@@ -71,6 +72,18 @@ function showPage(page){
   if(page==='guru')loadGuru();
   if(page==='unit')loadUnit();
   if(page==='users')loadUsers();
+
+  // Pastikan submenu induk terbuka apabila halaman anak dipilih.
+  const active=document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(active){
+    document.querySelectorAll('.nav-group').forEach(g=>{
+      if(g.contains(active)){
+        g.classList.add('open');
+        const t=g.querySelector(':scope > .nav-group-toggle');
+        if(t)t.setAttribute('aria-expanded','true');
+      }
+    });
+  }
 }
 
 function init(){
