@@ -128,6 +128,29 @@
   <div id="unitCards" class="unit-grid"></div>
   <div id="unitTableWrap" class="table-wrap"></div>
 </section>
+<section id="unitOverviewSection" class="card page-section page-unit-overview" hidden>
+  <div class="unit-overview-head">
+    <div><button id="unitOverviewBackBtn" class="btn secondary small" type="button">← Kembali ke Unit</button><div class="unit-overview-kicker">Kokurikulum • Unit</div><h2 id="unitOverviewTitle">Unit Kokurikulum</h2><p id="unitOverviewMeta" class="muted"></p></div>
+    <button id="unitOverviewRefreshBtn" class="btn secondary" type="button">↻ Refresh</button>
+  </div>
+  <div id="unitOverviewStats" class="unit-overview-stats"></div>
+  <div class="unit-overview-panel">
+    <div class="unit-overview-section-head"><div><h3>Senarai Ahli Unit</h3><small class="muted">Semua ahli aktif bagi tahun yang dipilih.</small></div></div>
+    <div id="unitOverviewMembers" class="table-wrap"></div>
+  </div>
+  <div class="unit-overview-panel">
+    <div class="unit-overview-section-head"><div><h3>Rekod Kehadiran Minggu 1–15</h3><small class="muted">Ringkasan kehadiran unit mengikut minggu persekolahan.</small></div></div>
+    <div id="unitOverviewWeeks" class="table-wrap"></div>
+  </div>
+  <div class="unit-overview-panel">
+    <div class="unit-overview-section-head"><div><h3>Kehadiran Setiap Ahli</h3><small class="muted">Status setiap murid bagi minggu 1 hingga 15.</small></div></div>
+    <div id="unitOverviewMemberAttendance" class="table-wrap"></div>
+  </div>
+  <div class="unit-overview-panel">
+    <div class="unit-overview-section-head"><div><h3>Jawatankuasa / AJK</h3><small class="muted">Senarai AJK unit bagi tahun yang dipilih.</small></div></div>
+    <div id="unitOverviewAjk" class="table-wrap"></div>
+  </div>
+</section>
 <section id="attendanceSection" class="card page-section page-attendance" hidden>
   <div class="head"><div><h2>Kehadiran Kokurikulum</h2><small class="muted">V2.4 • KEHADIRAN MURID MENGIKUT UNIT, TARIKH &amp; MINGGU</small></div><button id="attendanceRefreshBtn" class="btn secondary" type="button">↻ Refresh</button></div>
   <div class="attendance-kpis" id="attendanceKpis">
@@ -145,7 +168,7 @@
       <div><label>No. Perjumpaan</label><input id="attNoPerjumpaan" type="number" min="1" readonly></div>
     </div>
     <div class="attendance-actions"><button id="attLoadBtn" class="btn primary" type="button">Muat Senarai Ahli</button><button id="attSaveBtn" class="btn primary" type="button" disabled>Simpan Kehadiran</button></div>
-    <div id="attFormResult" class="result muted">Pilih unit, tahun dan tarikh kemudian tekan <b>Muat Senarai Ahli</b>.</div>
+    <div id="attFormResult" class="result muted"></div>
   </div>
   <div class="attendance-panel" id="attendanceEntryPanel" hidden>
     <div class="attendance-entry-head"><div><h3>Senarai Kehadiran</h3><p class="muted">Status lalai ialah HADIR. Tukar status dan catatan jika diperlukan.</p></div><div class="attendance-bulk"><button class="btn secondary small" type="button" data-att-bulk="HADIR">Semua Hadir</button><button class="btn secondary small" type="button" data-att-bulk="TIDAK HADIR">Semua Tidak Hadir</button></div></div>

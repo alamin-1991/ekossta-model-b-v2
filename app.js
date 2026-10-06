@@ -263,6 +263,7 @@ function showPage(page){
   if(page==='guru')loadGuru();
   if(page==='unit')loadUnit();
   if(page==='attendance')loadAttendancePage();
+  if(page==='unit-overview')loadUnitOverview();
   if(page==='users')loadUsers();
 
   // Pastikan submenu induk terbuka apabila halaman anak dipilih.
@@ -490,7 +491,7 @@ function renderUnit(rows){
   const cards=$('unitCards'),wrap=$('unitTableWrap');
   if(!rows.length){cards.innerHTML='';$('unitSummary').innerHTML='';wrap.innerHTML='<div class="empty">Tiada unit direkodkan.</div>';return}
   const totals=rows.reduce((a,r)=>({unit:a.unit+1,ahli:a.ahli+Number(r.JUMLAH_AHLI||0),lelaki:a.lelaki+Number(r.LELAKI||0),perempuan:a.perempuan+Number(r.PEREMPUAN||0)}),{unit:0,ahli:0,lelaki:0,perempuan:0});$('unitSummary').innerHTML=`<div><b>${totals.unit}</b><small>Unit</small></div><div><b>${totals.ahli}</b><small>Jumlah ahli</small></div><div><b>${totals.lelaki}</b><small>Lelaki</small></div><div><b>${totals.perempuan}</b><small>Perempuan</small></div>`;
-  cards.innerHTML=rows.map(r=>`<div class="unit-card"><div class="unit-card-top"><span class="unit-category">${esc(r.KATEGORI)}</span><span class="unit-status ${String(r.STATUS)==='AKTIF'?'on':'off'}">${esc(r.STATUS)}</span></div><h3>${esc(r.NAMA_UNIT)}</h3><p class="muted">Guru: ${esc(r.GURU_PENASIHAT||'Belum ditetapkan')} • Tahun ${esc(r.TAHUN)}</p><div class="unit-counts"><div><b>${Number(r.JUMLAH_AHLI||0)}</b><small>Jumlah</small></div><div><b>${Number(r.LELAKI||0)}</b><small>Lelaki</small></div><div><b>${Number(r.PEREMPUAN||0)}</b><small>Perempuan</small></div></div><button class="btn secondary small" onclick="viewUnitMembers('${escAttr(r.UNIT_ID)}')">Lihat Ahli</button>${state.user?.role==='ADMIN'?`<button class="btn secondary small" onclick="editUnit('${escAttr(r.UNIT_ID)}')">Edit</button><button class="btn secondary small" onclick="toggleUnit('${escAttr(r.UNIT_ID)}','${String(r.STATUS)==='AKTIF'?'TIDAK_AKTIF':'AKTIF'}')">${String(r.STATUS)==='AKTIF'?'Nyahaktif':'Aktifkan'}</button>`:''}</div>`).join('');
+  cards.innerHTML=rows.map(r=>`<div class="unit-card unit-card-clickable" role="button" tabindex="0" onclick="openUnitOverview('${escAttr(r.UNIT_ID)}','${escAttr(r.TAHUN)}')" onkeydown="if(event.key==='Enter'||event.key===' ')openUnitOverview('${escAttr(r.UNIT_ID)}','${escAttr(r.TAHUN)}')"><div class="unit-card-top"><span class="unit-category">${esc(r.KATEGORI)}</span><span class="unit-status ${String(r.STATUS)==='AKTIF'?'on':'off'}">${esc(r.STATUS)}</span></div><h3>${esc(r.NAMA_UNIT)}</h3><p class="muted">Guru: ${esc(r.GURU_PENASIHAT||'Belum ditetapkan')} • Tahun ${esc(r.TAHUN)}</p><div class="unit-counts"><div><b>${Number(r.JUMLAH_AHLI||0)}</b><small>Jumlah</small></div><div><b>${Number(r.LELAKI||0)}</b><small>Lelaki</small></div><div><b>${Number(r.PEREMPUAN||0)}</b><small>Perempuan</small></div></div><div class="unit-card-open">Buka Butiran Unit →</div><button class="btn secondary small" onclick="event.stopPropagation();viewUnitMembers('${escAttr(r.UNIT_ID)}')">Lihat Ahli</button>${state.user?.role==='ADMIN'?`<button class="btn secondary small" onclick="event.stopPropagation();editUnit('${escAttr(r.UNIT_ID)}')">Edit</button><button class="btn secondary small" onclick="event.stopPropagation();toggleUnit('${escAttr(r.UNIT_ID)}','${String(r.STATUS)==='AKTIF'?'TIDAK_AKTIF':'AKTIF'}')">${String(r.STATUS)==='AKTIF'?'Nyahaktif':'Aktifkan'}</button>`:''}</div>`).join('');
   const t=document.createElement('table'),thead=document.createElement('thead'),hr=document.createElement('tr');['UNIT','KATEGORI','GURU PENASIHAT','TAHUN','JUMLAH','LELAKI','PEREMPUAN','STATUS'].forEach(c=>{const th=document.createElement('th');th.textContent=c;hr.appendChild(th)});thead.appendChild(hr);t.appendChild(thead);const tb=document.createElement('tbody');rows.forEach(r=>{const tr=document.createElement('tr');[r.NAMA_UNIT,r.KATEGORI,r.GURU_PENASIHAT||'-',r.TAHUN,r.JUMLAH_AHLI||0,r.LELAKI||0,r.PEREMPUAN||0,r.STATUS].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});tb.appendChild(tr)});t.appendChild(tb);wrap.replaceChildren(t);
 }
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}function escAttr(v){return esc(v).replace(/`/g,'&#96;')}
@@ -568,6 +569,63 @@ function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');cle
 
 
 /* =========================================================
+   V2.4 UNIT OVERVIEW
+========================================================= */
+let UNIT_OVERVIEW_ID='';
+let UNIT_OVERVIEW_YEAR='';
+function unitOverviewEsc_(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function unitStatusMark_(v){
+  const s=String(v||'').toUpperCase();
+  if(s==='HADIR')return '<span class="uo-status hadir">✓</span>';
+  if(s==='TIDAK HADIR')return '<span class="uo-status tidak">✕</span>';
+  if(s==='BERSEBAB')return '<span class="uo-status bersebab">B</span>';
+  if(s==='CUTI')return '<span class="uo-status cuti">C</span>';
+  return '<span class="uo-status kosong">–</span>';
+}
+function openUnitOverview(unitId,tahun){
+  UNIT_OVERVIEW_ID=String(unitId||'');
+  UNIT_OVERVIEW_YEAR=String(tahun||new Date().getFullYear());
+  showPage('unit-overview');
+}
+async function loadUnitOverview(){
+  const title=$('unitOverviewTitle');
+  if(!UNIT_OVERVIEW_ID){showPage('unit');return;}
+  ['unitOverviewMembers','unitOverviewWeeks','unitOverviewMemberAttendance','unitOverviewAjk'].forEach(id=>{if($(id))$(id).innerHTML='<div class="empty">Memuatkan data...</div>';});
+  try{
+    const d=await apiGet('getUnitOverview',{token:state.token,unitId:UNIT_OVERVIEW_ID,tahun:UNIT_OVERVIEW_YEAR});
+    const u=d.unit||{};
+    if(title)title.textContent=u.NAMA_UNIT||'Unit Kokurikulum';
+    if($('unitOverviewMeta'))$('unitOverviewMeta').textContent=`${u.KATEGORI||'-'} • Guru Penasihat: ${u.GURU_PENASIHAT||'Belum ditetapkan'} • Tahun ${d.tahun}`;
+    const st=d.stats||{};
+    $('unitOverviewStats').innerHTML=`<div><b>${st.jumlahAhli||0}</b><small>Jumlah Ahli</small></div><div><b>${st.jumlahAJK||0}</b><small>AJK</small></div><div><b>${st.jumlahMingguDirekodkan||0}</b><small>Minggu Direkodkan</small></div><div><b>${(d.minggu||[]).filter(x=>x.ADA_REKOD).length?Math.round((d.minggu||[]).filter(x=>x.ADA_REKOD).reduce((a,x)=>a+x.PERATUS,0)/(d.minggu||[]).filter(x=>x.ADA_REKOD).length):0}%</b><small>Purata Kehadiran</small></div>`;
+    renderUnitOverviewMembers_(d.ahli||[]);
+    renderUnitOverviewWeeks_(d.minggu||[]);
+    renderUnitOverviewMemberAttendance_(d.ahli||[]);
+    renderUnitOverviewAjk_(d.ajk||[]);
+  }catch(e){toast(e.message||'Gagal memuatkan butiran unit.');}
+}
+function renderUnitOverviewMembers_(rows){
+  const w=$('unitOverviewMembers');if(!w)return;
+  if(!rows.length){w.innerHTML='<div class="empty">Tiada ahli aktif bagi tahun ini.</div>';return;}
+  w.innerHTML=`<table class="unit-overview-table"><thead><tr><th>#</th><th>Murid</th><th>Jantina</th><th>Tingkatan</th><th>Kelas</th><th>Status</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td><b>${unitOverviewEsc_(r.NAMA)}</b><small>${unitOverviewEsc_(r.NO_KP)}</small></td><td>${unitOverviewEsc_(r.JANTINA)}</td><td>${unitOverviewEsc_(r.TINGKATAN)}</td><td>${unitOverviewEsc_(r.KELAS)}</td><td>${unitOverviewEsc_(r.STATUS)}</td></tr>`).join('')}</tbody></table>`;
+}
+function renderUnitOverviewWeeks_(rows){
+  const w=$('unitOverviewWeeks');if(!w)return;
+  w.innerHTML=`<table class="unit-overview-table"><thead><tr><th>Minggu</th><th>Tarikh</th><th>Perjumpaan</th><th>Ahli</th><th>Hadir</th><th>Tidak Hadir</th><th>Bersebab</th><th>Cuti</th><th>Kehadiran</th></tr></thead><tbody>${rows.map(r=>`<tr class="${r.ADA_REKOD?'':'week-empty'}"><td><b>${r.MINGGU}</b></td><td>${r.TARIKH?new Date(r.TARIKH).toLocaleDateString('ms-MY'):'-'}</td><td>${r.NO_PERJUMPAAN||'-'}</td><td>${r.TOTAL}</td><td>${r.HADIR}</td><td>${r.TIDAK_HADIR}</td><td>${r.BERSEBAB}</td><td>${r.CUTI}</td><td><b>${r.PERATUS}%</b></td></tr>`).join('')}</tbody></table>`;
+}
+function renderUnitOverviewMemberAttendance_(rows){
+  const w=$('unitOverviewMemberAttendance');if(!w)return;
+  if(!rows.length){w.innerHTML='<div class="empty">Tiada ahli.</div>';return;}
+  const weeks=Array.from({length:15},(_,i)=>i+1);
+  w.innerHTML=`<div class="unit-overview-scroll"><table class="unit-overview-table unit-week-table"><thead><tr><th>Murid</th>${weeks.map(x=>`<th>M${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr><td><b>${unitOverviewEsc_(r.NAMA)}</b><small>${unitOverviewEsc_(r.KELAS)}</small></td>${weeks.map(w=>`<td>${unitStatusMark_((r.MINGGU||{})[w]?.STATUS)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="unit-week-legend"><span>✓ Hadir</span><span>✕ Tidak Hadir</span><span>B Bersebab</span><span>C Cuti</span><span>– Tiada rekod</span></div>`;
+}
+function renderUnitOverviewAjk_(rows){
+  const w=$('unitOverviewAjk');if(!w)return;
+  if(!rows.length){w.innerHTML='<div class="empty">Belum ada rekod AJK untuk unit ini bagi tahun tersebut.</div>';return;}
+  w.innerHTML=`<table class="unit-overview-table"><thead><tr><th>#</th><th>Murid</th><th>Jawatan</th><th>Tingkatan</th><th>Kelas</th><th>Status</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td><b>${unitOverviewEsc_(r.NAMA)}</b><small>${unitOverviewEsc_(r.NO_KP)}</small></td><td><span class="uo-role">${unitOverviewEsc_(r.JAWATAN)}</span></td><td>${unitOverviewEsc_(r.TINGKATAN)}</td><td>${unitOverviewEsc_(r.KELAS)}</td><td>${unitOverviewEsc_(r.STATUS)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+/* =========================================================
    V2.4 KEHADIRAN FRONTEND
 ========================================================= */
 let ATT_ROWS=[];
@@ -601,14 +659,7 @@ async function loadAttendanceForm(){
     if($('attMinggu')&&!minggu&&d.minggu)$('attMinggu').value=d.minggu;
     if($('attNoPerjumpaan'))$('attNoPerjumpaan').value=d.noPerjumpaan||'';
     ATT_ROWS=(d.members||[]).map(x=>({...x}));renderAttendanceTable_();
-    $('attendanceEntryPanel').hidden=false;$('attSaveBtn').disabled=!ATT_ROWS.length;
-    if(ATT_ROWS.length){
-      $('attFormResult').textContent=`${ATT_ROWS.length} ahli aktif • Perjumpaan ${d.noPerjumpaan||'-'}`;
-    }else{
-      const unitName=d.unit?.NAMA_UNIT||$('attUnit')?.selectedOptions?.[0]?.textContent||'unit dipilih';
-      $('attFormResult').innerHTML=`<b>Tiada murid ditemui.</b> Unit <b>${attEsc_(unitName)}</b> belum mempunyai penempatan murid <b>AKTIF</b> bagi tahun <b>${attEsc_(tahun)}</b>. Semak menu <b>Unit Kokurikulum → Lihat Ahli</b> dan pastikan tahun penempatan sama.`;
-    }
-    attSetKpi_();
+    $('attendanceEntryPanel').hidden=false;$('attSaveBtn').disabled=!ATT_ROWS.length;$('attFormResult').textContent=`${ATT_ROWS.length} ahli aktif • Perjumpaan ${d.noPerjumpaan||'-'}`;attSetKpi_();
   }catch(e){toast(e.message);$('attendanceEntryPanel').hidden=true}finally{b.disabled=false;b.textContent='Muat Senarai Ahli'}
 }
 function renderAttendanceTable_(){
@@ -635,4 +686,9 @@ function renderAttendanceRecords_(rows){
   wrap.innerHTML=`<table class="attendance-table"><thead><tr><th>Unit</th><th>Tarikh</th><th>Minggu</th><th>Perjumpaan</th><th>Hadir</th><th>Tidak Hadir</th><th>Kehadiran</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${attEsc_(r.NAMA_UNIT)}</td><td>${new Date(r.TARIKH).toLocaleDateString('ms-MY')}</td><td>${attEsc_(r.MINGGU)}</td><td>${attEsc_(r.NO_PERJUMPAAN)}</td><td>${r.HADIR}</td><td>${r.TIDAK_HADIR}</td><td><b>${r.PERATUS}%</b></td></tr>`).join('')}</tbody></table>`;
 }
 
+
+document.addEventListener('click',e=>{
+  if(e.target && e.target.id==='unitOverviewBackBtn')showPage('unit');
+  if(e.target && e.target.id==='unitOverviewRefreshBtn')loadUnitOverview();
+});
 document.addEventListener('DOMContentLoaded',init);
