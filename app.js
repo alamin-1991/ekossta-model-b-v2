@@ -1,24 +1,89 @@
 const $=id=>document.getElementById(id);
 const state={apiUrl:localStorage.getItem('ekossta_model_b_api_url')||'',dark:localStorage.getItem('ekossta_model_b_dark')==='1',token:sessionStorage.getItem('ekossta_v2_token')||'',user:JSON.parse(sessionStorage.getItem('ekossta_v2_user')||'null')};
 
+function isDesktopSidebar_(){
+  return window.matchMedia('(min-width: 769px)').matches;
+}
+
+function closeSidebarPopups_(except=null){
+  document.querySelectorAll('.nav-group.desktop-popup-open').forEach(group=>{
+    if(group!==except){
+      group.classList.remove('desktop-popup-open');
+      group.classList.remove('open');
+      const toggle=group.querySelector(':scope > .nav-group-toggle');
+      if(toggle)toggle.setAttribute('aria-expanded','false');
+    }
+  });
+}
+
+function positionSidebarPopup_(group){
+  if(!group || !isDesktopSidebar_())return;
+  const toggle=group.querySelector(':scope > .nav-group-toggle');
+  const menu=group.querySelector(':scope > .nav-submenu');
+  if(!toggle || !menu)return;
+
+  const r=toggle.getBoundingClientRect();
+  const gap=8;
+  const width=Math.min(260, Math.max(220, window.innerWidth-r.right-gap-14));
+  const maxHeight=Math.max(220, window.innerHeight-24);
+
+  menu.style.left=Math.round(r.right+gap)+'px';
+  menu.style.top=Math.round(Math.max(12, Math.min(r.top, window.innerHeight-maxHeight-12)))+'px';
+  menu.style.width=Math.round(width)+'px';
+  menu.style.maxHeight=Math.round(maxHeight)+'px';
+}
+
 function setupNavigation(){
   const buttons=[...document.querySelectorAll('.nav-item[data-page]')];
-  buttons.forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.page)));
+  buttons.forEach(btn=>btn.addEventListener('click',()=>{
+    showPage(btn.dataset.page);
+    if(isDesktopSidebar_())closeSidebarPopups_();
+  }));
 
   document.querySelectorAll('[data-page-jump]').forEach(btn=>{
     btn.addEventListener('click',()=>showPage(btn.dataset.pageJump));
   });
 
   document.querySelectorAll('.nav-group-toggle').forEach(btn=>{
-    btn.addEventListener('click',()=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
       const group=btn.closest('.nav-group');
       if(!group)return;
-      const open=group.classList.toggle('open');
-      btn.setAttribute('aria-expanded',open?'true':'false');
+
+      if(isDesktopSidebar_()){
+        const opening=!group.classList.contains('desktop-popup-open');
+        closeSidebarPopups_(opening?group:null);
+        group.classList.toggle('desktop-popup-open',opening);
+        group.classList.toggle('open',opening);
+        btn.setAttribute('aria-expanded',opening?'true':'false');
+        if(opening)requestAnimationFrame(()=>positionSidebarPopup_(group));
+      }else{
+        const open=group.classList.toggle('open');
+        btn.setAttribute('aria-expanded',open?'true':'false');
+      }
     });
   });
 
-  setupMobileMenu_();
+  document.addEventListener('click',e=>{
+    if(isDesktopSidebar_() && !e.target.closest('#sidebar'))closeSidebarPopups_();
+  });
+
+  window.addEventListener('resize',()=>{
+    if(isDesktopSidebar_()){
+      document.querySelectorAll('.nav-group.desktop-popup-open').forEach(positionSidebarPopup_);
+    }else{
+      document.querySelectorAll('.nav-submenu').forEach(m=>{m.style.left='';m.style.top='';m.style.width='';m.style.maxHeight=''});
+      document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('desktop-popup-open'));
+    }
+  });
+
+  if(isDesktopSidebar_()){
+    document.querySelectorAll('.nav-group').forEach(g=>{
+      g.classList.remove('open','desktop-popup-open');
+      const t=g.querySelector(':scope > .nav-group-toggle');
+      if(t)t.setAttribute('aria-expanded','false');
+    });
+  }
 
   const themeTargets=['themeBtn','desktopThemeBtn','sidebarThemeBtn'];
   themeTargets.forEach(id=>{
@@ -29,79 +94,6 @@ function setupNavigation(){
   const lo=$('sidebarLogoutBtn');
   if(lo)lo.onclick=logout;
 }
-
-function setupMobileMenu_(){
-  const mobileNav=$('mobileNav');
-  const drawer=$('mobileMenu');
-  const content=$('mobileMenuContent');
-  if(!mobileNav||!drawer||!content)return;
-
-  const openMenu=()=>{
-    buildMobileMenu_();
-    drawer.hidden=false;
-    drawer.setAttribute('aria-hidden','false');
-    document.body.classList.add('mobile-menu-open');
-    requestAnimationFrame(()=>drawer.classList.add('show'));
-  };
-  const closeMenu=()=>{
-    drawer.classList.remove('show');
-    drawer.setAttribute('aria-hidden','true');
-    document.body.classList.remove('mobile-menu-open');
-    setTimeout(()=>{drawer.hidden=true;},180);
-  };
-
-  mobileNav.querySelectorAll('[data-mobile-open-group]').forEach(btn=>btn.addEventListener('click',()=>openMenu()));
-  mobileNav.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.page)));
-  drawer.querySelectorAll('[data-mobile-close]').forEach(el=>el.addEventListener('click',closeMenu));
-  drawer.addEventListener('click',e=>{
-    const groupBtn=e.target.closest('.mobile-group-toggle');
-    if(groupBtn){
-      const group=groupBtn.closest('.mobile-menu-group');
-      if(!group)return;
-      group.classList.toggle('open');
-      groupBtn.setAttribute('aria-expanded',group.classList.contains('open')?'true':'false');
-      return;
-    }
-    const item=e.target.closest('[data-mobile-page]');
-    if(item){
-      showPage(item.dataset.mobilePage);
-      closeMenu();
-    }
-  });
-  drawer.addEventListener('click',e=>{
-    if(e.target===drawer)closeMenu();
-  });
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closeMenu();});
-}
-
-function buildMobileMenu_(){
-  const content=$('mobileMenuContent');
-  if(!content)return;
-  const role=state.user?.role||'';
-  const activePage=document.querySelector('.nav-item.active')?.dataset.page||'dashboard';
-  const canAdmin=role==='ADMIN';
-  const groups=[
-    {key:'kokurikulum',label:'Kokurikulum',icon:'◫',items:[
-      ['unit','Unit Kokurikulum',''],['penempatan','Penempatan Unit',''],['kehadiran','Kehadiran','V2.4'],['aktiviti','Aktiviti & Acara','V2.5'],['peserta','Peserta Aktiviti',''],['pencapaian','Pencapaian','V2.6']
-    ]},
-    {key:'laporan',label:'Laporan',icon:'▤',items:[['reports','Laporan Aktiviti',''],['galeri','Galeri','']]},
-    {key:'tetapan',label:'Tetapan',icon:'≡',items:[['system-settings','Tetapan Sistem',''],['guru','Guru',''],['murid','Murid',''],['users','Pengurusan Pengguna','']]}
-  ];
-  const allowed=page=>{
-    if(['guru','users','system-settings'].includes(page))return canAdmin;
-    return ['unit','penempatan','murid','reports'].includes(page);
-  };
-  const isDisabled=page=>!allowed(page)||['kehadiran','aktiviti','peserta','pencapaian','galeri'].includes(page);
-  content.innerHTML=`<button class="mobile-main-link ${activePage==='dashboard'?'active':''}" data-mobile-page="dashboard"><span>⌂</span><b>Dashboard</b></button>`+
-    groups.map(g=>`<div class="mobile-menu-group ${g.items.some(x=>x[0]===activePage)?'open':''}">
-      <button class="mobile-group-toggle" type="button" aria-expanded="${g.items.some(x=>x[0]===activePage)?'true':'false'}"><span><i>${g.icon}</i>${g.label}</span><b>›</b></button>
-      <div class="mobile-group-items">${g.items.map(([page,label,badge])=>{
-        const disabled=isDisabled(page);
-        return `<button class="mobile-menu-item ${activePage===page?'active':''} ${disabled?'disabled':''}" data-mobile-page="${page}" type="button" ${disabled?'disabled':''}><span>${label}</span>${badge?`<em>${badge}</em>`:''}</button>`;
-      }).join('')}</div>
-    </div>`).join('');
-}
-
 function showPage(page){
   const role=state.user?.role||'';
 
@@ -141,7 +133,6 @@ function showPage(page){
     if(e)e.textContent=title;
   });
 
-  if($('mobileMenu') && !$('mobileMenu').hidden) buildMobileMenu_();
 
   if(page==='dashboard'){loadMurid();loadUnit();}
   if(page==='murid')loadMurid();
@@ -149,7 +140,7 @@ function showPage(page){
   if(page==='unit')loadUnit();
   if(page==='users')loadUsers();
 
-  // Pastikan submenu induk terbuka apabila halaman anak dipilih.
+  // Pastikan submenu induk tersedia apabila halaman anak dipilih.
   const active=document.querySelector('.nav-item[data-page="'+page+'"]');
   if(active){
     document.querySelectorAll('.nav-group').forEach(g=>{
@@ -157,6 +148,11 @@ function showPage(page){
         g.classList.add('open');
         const t=g.querySelector(':scope > .nav-group-toggle');
         if(t)t.setAttribute('aria-expanded','true');
+        if(isDesktopSidebar_()){
+          closeSidebarPopups_(g);
+          g.classList.add('desktop-popup-open');
+          requestAnimationFrame(()=>positionSidebarPopup_(g));
+        }
       }
     });
   }
