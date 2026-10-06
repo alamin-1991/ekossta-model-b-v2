@@ -447,3 +447,19 @@ body.mobile-menu-open{overflow:hidden}
     display:block !important;
   }
 }
+
+/* PATCH V2.3: mobile logout + reliable theme control */
+.mobile-logout-btn{
+  width:100%;
+  margin:10px 0 0;
+  padding:12px 13px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface);
+  color:#d97979;
+  text-align:left;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.mobile-logout-btn:hover{background:var(--surface2);color:#ef8d8d}

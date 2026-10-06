@@ -126,6 +126,12 @@ function setupMobileMenu_(){
       groupBtn.setAttribute('aria-expanded',group.classList.contains('open')?'true':'false');
       return;
     }
+    const logoutBtn=e.target.closest('[data-mobile-logout]');
+    if(logoutBtn){
+      closeMenu();
+      logout();
+      return;
+    }
     const item=e.target.closest('[data-mobile-page]');
     if(item){
       showPage(item.dataset.mobilePage);
@@ -205,8 +211,9 @@ function buildMobileMenu_(preferredGroup=''){
           </div>
           ${renderItems([['users','Pengurusan Pengguna','']])}
         </div>
-      </div>`;
-    }).join('')}`;
+      </div>`
+    }).join('')}
+    <button class="mobile-logout-btn" data-mobile-logout type="button">Log Keluar</button>`;
 }
 
 function showPage(page){
@@ -274,7 +281,6 @@ function init(){
   setupNavigation();
   setThemeIcons_();
   const bind=(id,event,fn)=>{const e=$(id);if(e)e.addEventListener(event,fn)};
-  bind('themeBtn','click',toggleTheme);
   bind('loginBtn','click',login);
   bind('logoutBtn','click',logout);
   bind('meBtn','click',me);
