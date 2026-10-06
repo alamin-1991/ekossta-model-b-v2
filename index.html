@@ -21,5 +21,22 @@
   <div id="userResult" class="result muted"></div>
   <div id="usersTableWrap" class="table-wrap"><div class="empty">Belum dimuatkan.</div></div>
 </section>
-<section class="card"><h2>🛡️ Apa yang diuji dalam V2?</h2><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN boleh tambah murid; GURU hanya baca.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
+
+<section id="guruSection" class="card" hidden>
+  <div class="head"><div><h2>👨‍🏫 Pengurusan Guru</h2><small class="muted">ADMIN sahaja • TEST_GURU</small></div><button id="guruRefreshBtn" class="btn secondary">↻ Refresh</button></div>
+  <div class="form-grid guru-form-grid">
+    <div><label>No. Guru</label><input id="guruNo" placeholder="G001"></div>
+    <div><label>Nama</label><input id="guruNama" placeholder="Nama guru"></div>
+    <div><label>Email</label><input id="guruEmail" type="email" placeholder="guru@contoh.edu.my"></div>
+    <div><label>No. Telefon</label><input id="guruTel" placeholder="01X-XXXXXXX"></div>
+    <div><label>Status</label><select id="guruStatus"><option value="AKTIF">AKTIF</option><option value="TIDAK_AKTIF">TIDAK AKTIF</option></select></div>
+    <div><label>Akaun Login</label><select id="guruUserId"><option value="">-- Tiada pautan --</option></select></div>
+  </div>
+  <input id="guruOriginalNo" type="hidden">
+  <button id="addGuruBtn" class="btn primary">+ Tambah Guru</button>
+  <button id="cancelGuruBtn" class="btn secondary" hidden>Batal Edit</button>
+  <div id="guruResult" class="result muted"></div>
+  <div class="table-wrap"><div id="guruTableWrap"><div class="empty">Belum dimuatkan.</div></div></div>
+</section>
+<section class="card"><h2>🛡️ Apa yang diuji dalam V2?</h2><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN/GURU boleh tambah murid; backend semak role.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
 </section></main><div id="toast" class="toast"></div><script src="app.js"></script></body></html>
