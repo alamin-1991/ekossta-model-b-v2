@@ -601,7 +601,14 @@ async function loadAttendanceForm(){
     if($('attMinggu')&&!minggu&&d.minggu)$('attMinggu').value=d.minggu;
     if($('attNoPerjumpaan'))$('attNoPerjumpaan').value=d.noPerjumpaan||'';
     ATT_ROWS=(d.members||[]).map(x=>({...x}));renderAttendanceTable_();
-    $('attendanceEntryPanel').hidden=false;$('attSaveBtn').disabled=!ATT_ROWS.length;$('attFormResult').textContent=`${ATT_ROWS.length} ahli aktif • Perjumpaan ${d.noPerjumpaan||'-'}`;attSetKpi_();
+    $('attendanceEntryPanel').hidden=false;$('attSaveBtn').disabled=!ATT_ROWS.length;
+    if(ATT_ROWS.length){
+      $('attFormResult').textContent=`${ATT_ROWS.length} ahli aktif • Perjumpaan ${d.noPerjumpaan||'-'}`;
+    }else{
+      const unitName=d.unit?.NAMA_UNIT||$('attUnit')?.selectedOptions?.[0]?.textContent||'unit dipilih';
+      $('attFormResult').innerHTML=`<b>Tiada murid ditemui.</b> Unit <b>${attEsc_(unitName)}</b> belum mempunyai penempatan murid <b>AKTIF</b> bagi tahun <b>${attEsc_(tahun)}</b>. Semak menu <b>Unit Kokurikulum → Lihat Ahli</b> dan pastikan tahun penempatan sama.`;
+    }
+    attSetKpi_();
   }catch(e){toast(e.message);$('attendanceEntryPanel').hidden=true}finally{b.disabled=false;b.textContent='Muat Senarai Ahli'}
 }
 function renderAttendanceTable_(){

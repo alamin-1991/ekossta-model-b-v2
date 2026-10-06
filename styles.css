@@ -551,6 +551,32 @@ body.mobile-menu-open{overflow:hidden}
    V2.4 KEHADIRAN
 ========================================================= */
 .attendance-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}.attendance-kpi{padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--surface2);display:flex;flex-direction:column;gap:4px}.attendance-kpi b{font-size:25px;color:var(--text)}.attendance-kpi small{color:var(--muted);font-size:12px}.attendance-panel{margin-top:16px;padding:18px;border:1px solid var(--border);border-radius:16px;background:var(--surface)}.attendance-form-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.attendance-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.attendance-entry-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.attendance-entry-head h3{margin:0}.attendance-bulk{display:flex;gap:8px;flex-wrap:wrap}.attendance-record-filter{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.attendance-record-filter select,.attendance-record-filter input{min-width:170px}.attendance-table{width:100%;border-collapse:collapse}.attendance-table th,.attendance-table td{padding:10px 9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}.attendance-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.attendance-table td{font-size:13px}.attendance-table td small{display:block;color:var(--muted);margin-top:3px}.attendance-table select,.attendance-table input{width:100%;min-width:120px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text)}
-@media (max-width:900px){.attendance-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.attendance-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.attendance-entry-head{align-items:flex-start;flex-direction:column}}
-@media (max-width:640px){.attendance-form-grid{grid-template-columns:1fr}.attendance-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.attendance-panel{padding:14px}.attendance-table{min-width:760px}.attendance-entry-head{gap:10px}.attendance-record-filter select,.attendance-record-filter input{min-width:0;flex:1}}
+@media (max-width:1180px){
+  .attendance-form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:1024px){
+  .attendance-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .attendance-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .attendance-panel{padding:16px}
+  .attendance-entry-head{align-items:flex-start;flex-direction:column}
+  .attendance-record-filter{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.6fr) auto;align-items:center}
+  .attendance-record-filter select,.attendance-record-filter input{min-width:0;width:100%}
+}
+@media (max-width:760px){
+  .attendance-form-grid{grid-template-columns:1fr}
+  .attendance-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .attendance-panel{padding:14px}
+  .attendance-actions{display:grid;grid-template-columns:1fr}
+  .attendance-actions .btn{width:100%}
+  .attendance-record-filter{grid-template-columns:1fr}
+  .attendance-record-filter select,.attendance-record-filter input,.attendance-record-filter .btn{width:100%;min-width:0}
+}
+@media (max-width:480px){
+  .attendance-kpi{padding:13px}
+  .attendance-kpi b{font-size:22px}
+  .attendance-table{min-width:760px}
+  .attendance-entry-head h3{font-size:18px}
+  .attendance-bulk{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .attendance-bulk .btn{width:100%}
+}
 html.dark-mode-active .attendance-kpi{background:var(--surface2)}
