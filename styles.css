@@ -633,3 +633,28 @@ html.dark-mode-active .attendance-kpi{background:var(--surface2)}
 .unit-overview-table{width:100%;border-collapse:collapse}.unit-overview-table th,.unit-overview-table td{padding:10px 9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle;font-size:13px}.unit-overview-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.unit-overview-table td small{display:block;color:var(--muted);margin-top:3px}.week-empty{opacity:.55}.unit-overview-scroll{overflow-x:auto}.unit-week-table{min-width:1050px}.unit-week-table th:not(:first-child),.unit-week-table td:not(:first-child){text-align:center}.uo-status{display:inline-flex;width:27px;height:27px;align-items:center;justify-content:center;border-radius:8px;font-size:12px;font-weight:900}.uo-status.hadir{background:#dff5e7;color:#198754}.uo-status.tidak{background:#fde3e1;color:#c0392b}.uo-status.bersebab{background:#fff0cc;color:#9a6700}.uo-status.cuti{background:#e5e7eb;color:#5f6368}.uo-status.kosong{background:var(--surface2);color:var(--muted)}.unit-week-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:11px}.uo-role{display:inline-block;padding:5px 8px;border-radius:999px;background:var(--surface2);color:var(--primary);font-weight:800;font-size:11px}
 @media(max-width:900px){.unit-overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.unit-overview-head{align-items:flex-start}}
 @media(max-width:640px){.unit-overview-head{flex-direction:column}.unit-overview-stats{grid-template-columns:1fr 1fr}.unit-overview-panel{padding:14px}.unit-overview-table{min-width:760px}.unit-overview-head h2{font-size:23px}}
+
+/* V2.4 MICRO PATCH — SIDEBAR SUBMENU DARK + KEHADIRAN TITLE ONLY */
+@media(min-width:769px){
+  .nav-group > .nav-submenu,
+  .nav-group.desktop-popup-open > .nav-submenu{
+    background:#18191f !important;
+    color:#f7f7fb !important;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-item,
+  .nav-group.desktop-popup-open > .nav-submenu .nav-group-toggle{
+    color:#bdbcc7 !important;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-item:hover,
+  .nav-group.desktop-popup-open > .nav-submenu .nav-group-toggle:hover{
+    background:rgba(255,255,255,.07) !important;
+    color:#fff !important;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-item.active{
+    background:rgba(91,63,208,.24) !important;
+    color:#fff !important;
+  }
+  .nav-group.desktop-popup-open > .nav-submenu .nav-item em{
+    color:#858492 !important;
+  }
+}
