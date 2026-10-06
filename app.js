@@ -5,6 +5,10 @@ function isDesktopSidebar_(){
   return window.matchMedia('(min-width: 769px)').matches;
 }
 
+function isDesktopDropdown_(){
+  return window.matchMedia('(min-width: 1025px)').matches;
+}
+
 function closeSidebarPopups_(except=null){
   document.querySelectorAll('.nav-group.desktop-popup-open').forEach(group=>{
     if(group!==except){
@@ -47,7 +51,7 @@ function setupNavigation(){
       e.stopPropagation();
       const group=btn.closest('.nav-group');
       if(!group)return;
-      if(isDesktopSidebar_()){
+      if(isDesktopSidebar_() && !isDesktopDropdown_()){
         const opening=!group.classList.contains('desktop-popup-open');
         closeSidebarPopups_(opening?group:null);
         group.classList.toggle('desktop-popup-open',opening);
@@ -266,12 +270,14 @@ function showPage(page){
   if(page==='unit-overview')loadUnitOverview();
   if(page==='users')loadUsers();
 
-  // Pastikan submenu induk terbuka apabila halaman anak dipilih.
+  // Pastikan submenu induk terbuka hanya pada desktop dropdown.
+  // Tablet menggunakan popup dan perlu ditutup selepas pilihan dibuat.
   const active=document.querySelector('.nav-item[data-page="'+page+'"]');
-  if(active){
+  if(active && isDesktopDropdown_()){
     document.querySelectorAll('.nav-group').forEach(g=>{
       if(g.contains(active)){
         g.classList.add('open');
+        g.classList.remove('desktop-popup-open');
         const t=g.querySelector(':scope > .nav-group-toggle');
         if(t)t.setAttribute('aria-expanded','true');
       }

@@ -17,6 +17,27 @@ body{min-height:100vh}
 .side-nav{overflow:auto;flex:1}.nav-label{font-size:9px;letter-spacing:.12em;color:#777684;font-weight:800;padding:18px 11px 7px}.nav-item{width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:#bdbcc7;padding:10px 11px;border-radius:11px;cursor:pointer;text-align:left;font-size:12px;font-weight:700;margin:2px 0}.nav-item span:first-child{width:20px;text-align:center;font-size:15px}.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}.nav-item.active{background:rgba(91,63,208,.24);color:#fff}.nav-item.disabled{opacity:.42;cursor:not-allowed}.nav-item em{margin-left:auto;font-size:8px;color:#858492;font-style:normal}.sidebar-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:10px}.danger-nav{color:#e5a3a3}.profile-mini{display:flex;align-items:center;gap:9px;padding:11px 8px 3px}.avatar{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#302e3b;color:#fff;font-weight:800}.profile-mini b,.profile-mini small{display:block;max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profile-mini b{font-size:11px}.profile-mini small{font-size:9px;color:#888795;margin-top:2px}
 .app-shell{margin-left:252px;min-height:100vh}.desktop-topbar{height:64px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;background:color-mix(in srgb,var(--surface2) 90%,transparent);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;backdrop-filter:blur(14px)}.breadcrumb{font-size:10px;color:var(--muted);margin-right:9px}.desktop-topbar strong{font-size:14px}.top-actions{display:flex;align-items:center;gap:8px}.user-chip{font-size:11px;color:var(--muted);padding:7px 10px;border:1px solid var(--border);border-radius:999px}.icon-btn{border:1px solid var(--border);background:var(--surface);border-radius:11px;padding:8px 10px;cursor:pointer}.mobile-topbar{display:none}
 .app-shell .container{width:min(1180px,calc(100% - 36px));margin:22px auto 50px}.page-section{scroll-margin-top:80px}.empty-state-large{text-align:center;padding:55px 20px}.empty-icon{font-size:38px;margin-bottom:8px}
+@media(min-width:1025px){
+  .nav-group > .nav-submenu{
+    position:static !important;
+    left:auto !important;
+    top:auto !important;
+    width:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+    display:none;
+    padding:2px 0 5px;
+  }
+
+  .nav-group.open > .nav-submenu{
+    display:block;
+  }
+
+  .nav-group.desktop-popup-open > .nav-submenu{
+    position:static !important;
+  }
+}
+
 @media(max-width:1024px) and (min-width:769px){.sidebar{width:228px;padding-inline:10px}.brand{padding-bottom:18px}.app-shell{margin-left:228px}.desktop-topbar{padding-inline:18px}.nav-group-toggle{padding:10px}.nav-subitem{padding-left:34px}}
 @media(max-width:768px){.sidebar{display:none}.app-shell{margin-left:0;padding-bottom:76px}.desktop-topbar{display:none}.mobile-topbar{display:flex;position:sticky;top:0;z-index:30;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface2);border-bottom:1px solid var(--border);backdrop-filter:blur(14px)}.mobile-topbar b{font-size:16px}.mobile-topbar small{display:block;color:var(--muted);font-size:10px;margin-top:1px}.app-shell .container{width:calc(100% - 14px);margin:12px auto 25px}.mobile-nav{position:fixed;display:flex;left:8px;right:8px;bottom:8px;height:62px;background:var(--surface2);border:1px solid var(--border);border-radius:19px;box-shadow:0 10px 35px rgba(0,0,0,.18);z-index:50;padding:5px}.mobile-nav .nav-item{margin:0;flex:1;justify-content:center;flex-direction:column;gap:2px;padding:5px 2px;font-size:9px;border-radius:14px}.mobile-nav .nav-item span:first-child{font-size:17px;width:auto}.mobile-nav .nav-item span:last-child{display:block}.mobile-nav .nav-item.active{color:var(--primary);background:var(--surface)}}
 @media(min-width:769px){.mobile-nav{display:none}}
@@ -192,6 +213,27 @@ body.logged-out #loginView{
 
 .minimal-icon{
   color:var(--primary);
+}
+
+@media(min-width:1025px){
+  .nav-group > .nav-submenu{
+    position:static !important;
+    left:auto !important;
+    top:auto !important;
+    width:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+    display:none;
+    padding:2px 0 5px;
+  }
+
+  .nav-group.open > .nav-submenu{
+    display:block;
+  }
+
+  .nav-group.desktop-popup-open > .nav-submenu{
+    position:static !important;
+  }
 }
 
 @media(max-width:1024px) and (min-width:769px){
@@ -415,6 +457,27 @@ body.mobile-menu-open{overflow:hidden}
    PATCH: SURFACE PRO / TABLET SIDEBAR LABELS
    Kekalkan teks menu utama; popup submenu tidak disentuh.
    ========================================================= */
+@media(min-width:1025px){
+  .nav-group > .nav-submenu{
+    position:static !important;
+    left:auto !important;
+    top:auto !important;
+    width:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+    display:none;
+    padding:2px 0 5px;
+  }
+
+  .nav-group.open > .nav-submenu{
+    display:block;
+  }
+
+  .nav-group.desktop-popup-open > .nav-submenu{
+    position:static !important;
+  }
+}
+
 @media(max-width:1024px) and (min-width:769px){
   .sidebar{width:228px;padding-inline:10px;}
   .app-shell{margin-left:228px;}
