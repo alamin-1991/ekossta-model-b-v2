@@ -174,9 +174,9 @@ function buildMobileMenu_(preferredGroup=''){
 
   const allowed=page=>{
     if(['guru','users','system-settings'].includes(page))return canAdmin;
-    return ['unit','penempatan','murid','reports'].includes(page);
+    return ['unit','penempatan','murid','reports','attendance'].includes(page);
   };
-  const isDisabled=page=>!allowed(page)||['kehadiran','aktiviti','peserta','pencapaian','galeri'].includes(page);
+  const isDisabled=page=>!allowed(page)||['aktiviti','peserta','pencapaian','galeri'].includes(page);
 
   const groupIsOpen=g=>{
     if(preferredGroup && g.key===preferredGroup)return true;
@@ -237,7 +237,8 @@ function showPage(page){
     users:'Pengurusan Pengguna',
     analysis:'Analisis',
     reports:'Laporan Aktiviti',
-    'system-settings':'Tetapan Sistem'
+    'system-settings':'Tetapan Sistem',
+    attendance:'Kehadiran'
   };
 
   document.querySelectorAll('.page-section').forEach(el=>el.hidden=true);
@@ -261,6 +262,7 @@ function showPage(page){
   if(page==='murid')loadMurid();
   if(page==='guru')loadGuru();
   if(page==='unit')loadUnit();
+  if(page==='attendance')loadAttendancePage();
   if(page==='users')loadUsers();
 
   // Pastikan submenu induk terbuka apabila halaman anak dipilih.
@@ -296,6 +298,11 @@ function init(){
   bind('addUnitBtn','click',saveUnit);
   bind('cancelUnitBtn','click',cancelUnit);
   bind('addMemberBtn','click',addUnitMember);
+  bind('attendanceRefreshBtn','click',loadAttendancePage);
+  bind('attLoadBtn','click',loadAttendanceForm);
+  bind('attSaveBtn','click',saveAttendance);
+  bind('attRecordRefreshBtn','click',loadAttendanceRecords);
+  document.querySelectorAll('[data-att-bulk]').forEach(btn=>btn.addEventListener('click',()=>bulkAttendanceStatus(btn.dataset.attBulk)));
   if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(console.warn);
   if(state.token&&state.user)showApp();else showLogin();
 }
@@ -558,4 +565,67 @@ function toggleTheme(){
   setThemeIcons_();
 }
 function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),3200)}
+
+
+/* =========================================================
+   V2.4 KEHADIRAN FRONTEND
+========================================================= */
+let ATT_ROWS=[];
+let ATT_UNITS=[];
+function attYear_(){return String(new Date().getFullYear());}
+function attDate_(){return new Date().toISOString().slice(0,10);}
+function attEsc_(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function attSetKpi_(){
+  const rows=ATT_ROWS||[]; const total=rows.length; const hadir=rows.filter(r=>r.STATUS==='HADIR').length; const tidak=rows.filter(r=>r.STATUS==='TIDAK HADIR').length;
+  const pct=total?Math.round(hadir/total*100):0;
+  if($('attKpiJumlah'))$('attKpiJumlah').textContent=total;
+  if($('attKpiHadir'))$('attKpiHadir').textContent=hadir;
+  if($('attKpiTidak'))$('attKpiTidak').textContent=tidak;
+  if($('attKpiPeratus'))$('attKpiPeratus').textContent=pct+'%';
+}
+function attFillUnits_(units,selectId,placeholder){
+  const el=$(selectId);if(!el)return;const current=el.value;
+  el.innerHTML=`<option value="">${placeholder}</option>`+(units||[]).map(u=>`<option value="${attEsc_(u.UNIT_ID)}">${attEsc_(u.NAMA_UNIT)}</option>`).join('');
+  if(current)el.value=current;
+}
+async function loadAttendancePage(){
+  const y=$('attTahun');const d=$('attTarikh');if(y&&!y.value)y.value=attYear_();if(d&&!d.value)d.value=attDate_();
+  try{const data=await apiGet('getUnit',{token:state.token});ATT_UNITS=(data.data||[]).filter(u=>String(u.STATUS||'').toUpperCase()==='AKTIF');attFillUnits_(ATT_UNITS,'attUnit','-- Pilih Unit --');attFillUnits_(ATT_UNITS,'attRecordUnit','Semua Unit');await loadAttendanceRecords();}catch(e){toast(e.message)}
+}
+async function loadAttendanceForm(){
+  const unit=$('attUnit')?.value,tahun=$('attTahun')?.value,tarikh=$('attTarikh')?.value,minggu=$('attMinggu')?.value;
+  if(!unit||!tahun||!tarikh)return toast('Pilih unit, tahun dan tarikh dahulu.');
+  const b=$('attLoadBtn');b.disabled=true;b.textContent='Memuatkan...';
+  try{
+    const d=await apiGet('getAttendanceForm',{token:state.token,unitId:unit,tahun,tarikh});
+    if($('attMinggu')&&!minggu&&d.minggu)$('attMinggu').value=d.minggu;
+    if($('attNoPerjumpaan'))$('attNoPerjumpaan').value=d.noPerjumpaan||'';
+    ATT_ROWS=(d.members||[]).map(x=>({...x}));renderAttendanceTable_();
+    $('attendanceEntryPanel').hidden=false;$('attSaveBtn').disabled=!ATT_ROWS.length;$('attFormResult').textContent=`${ATT_ROWS.length} ahli aktif • Perjumpaan ${d.noPerjumpaan||'-'}`;attSetKpi_();
+  }catch(e){toast(e.message);$('attendanceEntryPanel').hidden=true}finally{b.disabled=false;b.textContent='Muat Senarai Ahli'}
+}
+function renderAttendanceTable_(){
+  const wrap=$('attendanceTableWrap');if(!wrap)return;
+  if(!ATT_ROWS.length){wrap.innerHTML='<div class="empty">Tiada ahli aktif ditemui untuk unit dan tahun ini.</div>';return;}
+  const rows=ATT_ROWS.map((r,i)=>`<tr data-att-row="${i}"><td>${i+1}</td><td><b>${attEsc_(r.NAMA)}</b><small>${attEsc_(r.NO_KP)}</small></td><td>${attEsc_(r.KELAS||'-')}</td><td>${attEsc_(r.JANTINA||'-')}</td><td><select class="att-status" data-index="${i}"><option>HADIR</option><option>TIDAK HADIR</option><option>BERSEBAB</option><option>CUTI</option></select></td><td><input class="att-note" data-index="${i}" value="${attEsc_(r.CATATAN||'')}" placeholder="Catatan"></td></tr>`).join('');
+  wrap.innerHTML=`<table class="attendance-table"><thead><tr><th>#</th><th>Murid</th><th>Kelas</th><th>Jantina</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody></table>`;
+  wrap.querySelectorAll('.att-status').forEach(e=>{e.value=ATT_ROWS[Number(e.dataset.index)].STATUS||'HADIR';e.addEventListener('change',()=>{ATT_ROWS[Number(e.dataset.index)].STATUS=e.value;attSetKpi_()})});
+  wrap.querySelectorAll('.att-note').forEach(e=>e.addEventListener('input',()=>{ATT_ROWS[Number(e.dataset.index)].CATATAN=e.value}));
+}
+function bulkAttendanceStatus(status){ATT_ROWS.forEach(r=>r.STATUS=status);renderAttendanceTable_();attSetKpi_()}
+async function saveAttendance(){
+  if(!ATT_ROWS.length)return toast('Tiada senarai murid untuk disimpan.');
+  const minggu=$('attMinggu')?.value;if(!minggu)return toast('Masukkan Minggu Persekolahan.');
+  const b=$('attSaveBtn');b.disabled=true;b.textContent='Menyimpan...';
+  try{const p={token:state.token,unitId:$('attUnit').value,tahun:$('attTahun').value,tarikh:$('attTarikh').value,minggu,noPerjumpaan:$('attNoPerjumpaan').value,members:JSON.stringify(ATT_ROWS.map(r=>({NO_KP:r.NO_KP,STATUS:r.STATUS||'HADIR',CATATAN:r.CATATAN||''})))};const d=await apiGet('saveAttendance',p);$('attFormResult').textContent=d.message||'Berjaya.';toast(d.message||'Kehadiran berjaya disimpan.');await loadAttendanceRecords();}catch(e){toast(e.message)}finally{b.disabled=false;b.textContent='Simpan Kehadiran'}
+}
+async function loadAttendanceRecords(){
+  if(!$('attendanceRecordsWrap'))return;
+  try{const p={token:state.token,tahun:$('attTahun')?.value||attYear_(),unitId:$('attRecordUnit')?.value||'',minggu:$('attRecordMinggu')?.value||''};const d=await apiGet('getAttendanceRecords',p);renderAttendanceRecords_(d.data||[]);}catch(e){toast(e.message)}
+}
+function renderAttendanceRecords_(rows){
+  const wrap=$('attendanceRecordsWrap');if(!wrap)return;if(!rows.length){wrap.innerHTML='<div class="empty">Belum ada rekod kehadiran.</div>';return;}
+  wrap.innerHTML=`<table class="attendance-table"><thead><tr><th>Unit</th><th>Tarikh</th><th>Minggu</th><th>Perjumpaan</th><th>Hadir</th><th>Tidak Hadir</th><th>Kehadiran</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${attEsc_(r.NAMA_UNIT)}</td><td>${new Date(r.TARIKH).toLocaleDateString('ms-MY')}</td><td>${attEsc_(r.MINGGU)}</td><td>${attEsc_(r.NO_PERJUMPAAN)}</td><td>${r.HADIR}</td><td>${r.TIDAK_HADIR}</td><td><b>${r.PERATUS}%</b></td></tr>`).join('')}</tbody></table>`;
+}
+
 document.addEventListener('DOMContentLoaded',init);
