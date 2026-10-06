@@ -65,17 +65,6 @@ function showPage(page){
     if(e)e.textContent=title;
   });
 
-  document.querySelectorAll('.nav-group').forEach(group=>{
-    const contains=group.querySelector(
-      `.nav-item[data-page="${page}"]`
-    );
-
-    if(contains){
-      group.classList.add('open');
-      const toggle=group.querySelector('.nav-group-toggle');
-      if(toggle)toggle.setAttribute('aria-expanded','true');
-    }
-  });
 
   if(page==='dashboard'){loadMurid();loadUnit();}
   if(page==='murid')loadMurid();
@@ -84,7 +73,32 @@ function showPage(page){
   if(page==='users')loadUsers();
 }
 
-function init(){if(state.dark){document.documentElement.classList.add('dark');['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{if($(id))$(id).textContent='☀️'})}setupNavigation();$('themeBtn').onclick=toggleTheme;$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('meBtn').onclick=me;$('loadBtn').onclick=loadMurid;$('refreshBtn').onclick=loadMurid;$('addBtn').onclick=addMurid;$('addUserBtn').onclick=addUser;$('usersRefreshBtn').onclick=loadUsers;$('guruRefreshBtn').onclick=loadGuru;$('addGuruBtn').onclick=saveGuru;$('cancelGuruBtn').onclick=cancelGuru;$('unitRefreshBtn').onclick=loadUnit;$('addUnitBtn').onclick=saveUnit;$('cancelUnitBtn').onclick=cancelUnit;$('addMemberBtn').onclick=addUnitMember;if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(console.warn);if(state.token&&state.user)showApp();else showLogin()}
+function init(){
+  if(state.dark){
+    document.documentElement.classList.add('dark');
+    ['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{if($(id))$(id).textContent='☀️'});
+  }
+  setupNavigation();
+  const bind=(id,event,fn)=>{const e=$(id);if(e)e.addEventListener(event,fn)};
+  bind('themeBtn','click',toggleTheme);
+  bind('loginBtn','click',login);
+  bind('logoutBtn','click',logout);
+  bind('meBtn','click',me);
+  bind('loadBtn','click',loadMurid);
+  bind('refreshBtn','click',loadMurid);
+  bind('addBtn','click',addMurid);
+  bind('addUserBtn','click',addUser);
+  bind('usersRefreshBtn','click',loadUsers);
+  bind('guruRefreshBtn','click',loadGuru);
+  bind('addGuruBtn','click',saveGuru);
+  bind('cancelGuruBtn','click',cancelGuru);
+  bind('unitRefreshBtn','click',loadUnit);
+  bind('addUnitBtn','click',saveUnit);
+  bind('cancelUnitBtn','click',cancelUnit);
+  bind('addMemberBtn','click',addUnitMember);
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(console.warn);
+  if(state.token&&state.user)showApp();else showLogin();
+}
 function apiGet(action,params={}){
   return new Promise((resolve,reject)=>{
     let u;
@@ -305,11 +319,8 @@ function showApp(){
   $('welcome').textContent=
     `Selamat datang, ${state.user?.nama||state.user?.username||''}.`;
 
-  $('roleValue').textContent=state.user?.role||'-';
-
   const isAdmin=state.user?.role==='ADMIN';
 
-  $('adminSection').hidden=!['ADMIN','GURU'].includes(state.user?.role);
   $('userSection').hidden=!isAdmin;
   $('guruSection').hidden=!isAdmin;
   $('unitSection').hidden=false;
@@ -322,7 +333,7 @@ function showApp(){
   $('sideUserName').textContent=
     state.user?.nama||state.user?.username||'Pengguna';
 
-  $('sideUserRole').textContent=state.user?.role||'-';
+  $('sideUserRole').textContent='Pengguna';
   $('desktopUser').textContent=state.user?.nama||state.user?.username||'-';
 
   showPage('dashboard');

@@ -229,3 +229,10 @@ body.logged-out #loginView{
     text-align:left;
   }
 }
+
+
+/* PATCH FIX: native hidden must always hide page sections. */
+[hidden]{display:none !important;}
+.nav-section-label{font-size:9px;letter-spacing:.12em;color:#777684;font-weight:800;padding:16px 11px 6px;border-top:1px solid rgba(255,255,255,.06);margin-top:5px;}
+.nav-subitem{padding-left:11px;}
+.nav-subitem .nav-icon{width:17px;height:17px;flex-basis:17px;}

@@ -12,105 +12,50 @@
   </div>
 
   <nav class="side-nav">
-
     <button class="nav-item active" data-page="dashboard" type="button">
       <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
       <span>Dashboard</span>
     </button>
 
-    <div class="nav-group">
-      <button class="nav-group-toggle" type="button" aria-expanded="false">
-        <span class="nav-group-left">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>
-          <span>Kokurikulum</span>
-        </span>
-        <svg class="nav-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
-      </button>
+    <div class="nav-section-label">PENGURUSAN DATA</div>
+    <button class="nav-item nav-subitem" data-page="murid" type="button">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 9h5M16 13h5M16 17h5"/></svg>
+      <span>Murid</span>
+    </button>
+    <button class="nav-item nav-subitem" data-page="guru" type="button">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+      <span>Guru</span>
+    </button>
+    <button class="nav-item nav-subitem" data-page="unit" type="button">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>
+      <span>Unit Kokurikulum</span>
+    </button>
+    <button class="nav-item nav-subitem" data-page="penempatan" type="button">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14 18a4 4 0 0 1 7 0"/></svg>
+      <span>Penempatan Unit</span>
+    </button>
 
-      <div class="nav-submenu">
-        <button class="nav-item nav-subitem" data-page="unit" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>
-          <span>Unit Kokurikulum</span>
-        </button>
+    <div class="nav-section-label">KOKURIKULUM</div>
+    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 3v4M18 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1z"/></svg><span>Kehadiran</span><em>V2.4</em></button>
+    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Aktiviti &amp; Acara</span><em>V2.5</em></button>
+    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M3 19a5 5 0 0 1 10 0M15 7h5M15 11h5M15 15h5"/></svg><span>Peserta Aktiviti</span></button>
+    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8z"/></svg><span>Pencapaian</span><em>V2.6</em></button>
+    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h6M8 16h8"/></svg><span>Laporan Aktiviti</span></button>
+    <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m6 16 4-4 3 3 2-2 3 3"/></svg><span>Galeri</span></button>
 
-        <button class="nav-item nav-subitem" data-page="penempatan" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14 18a4 4 0 0 1 7 0"/></svg>
-          <span>Penempatan Unit</span>
-        </button>
-
-        <button class="nav-item nav-subitem disabled" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 3v4M18 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1z"/></svg>
-          <span>Kehadiran</span><em>V2.4</em>
-        </button>
-
-        <button class="nav-item nav-subitem disabled" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg>
-          <span>Aktiviti &amp; Acara</span><em>V2.5</em>
-        </button>
-
-        <button class="nav-item nav-subitem disabled" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M3 19a5 5 0 0 1 10 0M15 7h5M15 11h5M15 15h5"/></svg>
-          <span>Peserta Aktiviti</span>
-        </button>
-
-        <button class="nav-item nav-subitem disabled" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8z"/></svg>
-          <span>Pencapaian</span><em>V2.6</em>
-        </button>
-
-        <button class="nav-item nav-subitem disabled" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h6M8 16h8"/></svg>
-          <span>Laporan Aktiviti</span>
-        </button>
-
-        <button class="nav-item nav-subitem disabled" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m6 16 4-4 3 3 2-2 3 3"/></svg>
-          <span>Galeri</span>
-        </button>
-      </div>
-    </div>
-
-    <button class="nav-item" data-page="analysis" type="button">
+    <div class="nav-section-label">ANALISIS &amp; SISTEM</div>
+    <button class="nav-item nav-subitem" data-page="analysis" type="button">
       <svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 19V9M12 19V5M19 19v-8"/></svg>
       <span>Analisis Laporan</span>
     </button>
-
-    <div class="nav-group">
-      <button class="nav-group-toggle" type="button" aria-expanded="false">
-        <span class="nav-group-left">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v1.1a6.8 6.8 0 0 1 2.1 1.3l1-.6a2 2 0 0 1 2.7.7l.3.5a2 2 0 0 1-.7 2.7l-1 .6c.1.5.2 1 .2 1.7s-.1 1.2-.2 1.7l1 .6a2 2 0 0 1 .7 2.7l-.3.5a2 2 0 0 1-2.7.7l-1-.6a6.8 6.8 0 0 1-2.1 1.3V18a3 3 0 0 1-6 0v-1.1a6.8 6.8 0 0 1-2.1-1.3l-1 .6a2 2 0 0 1-2.7-.7l-.3-.5a2 2 0 0 1 .7-2.7l1-.6A7 7 0 0 1 6.2 12c0-.6.1-1.2.2-1.7l-1-.6a2 2 0 0 1-.7-2.7l.3-.5a2 2 0 0 1 2.7-.7l1 .6A6.8 6.8 0 0 1 11 7.1V6a3 3 0 0 1 1-3z"/><circle cx="12" cy="12" r="2.5"/></svg>
-          <span>Tetapan</span>
-        </span>
-        <svg class="nav-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
-      </button>
-
-      <div class="nav-submenu">
-        <div class="nav-subtitle">PENGURUSAN DATA</div>
-
-        <button class="nav-item nav-subitem" data-page="guru" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
-          <span>Guru</span>
-        </button>
-
-        <button class="nav-item nav-subitem" data-page="murid" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 9h5M16 13h5M16 17h5"/></svg>
-          <span>Murid</span>
-        </button>
-
-        <div class="nav-subtitle">TETAPAN SISTEM</div>
-
-        <button class="nav-item nav-subitem admin-nav" data-page="users" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 8h5M16 12h5M16 16h5"/></svg>
-          <span>Pengurusan Pengguna</span>
-        </button>
-
-        <button class="nav-item nav-subitem admin-nav" data-page="system-settings" type="button">
-          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/></svg>
-          <span>Tetapan Sistem</span>
-        </button>
-      </div>
-    </div>
-
+    <button class="nav-item nav-subitem admin-nav" data-page="users" type="button">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 8h5M16 12h5M16 16h5"/></svg>
+      <span>Pengurusan Pengguna</span>
+    </button>
+    <button class="nav-item nav-subitem admin-nav" data-page="system-settings" type="button">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/></svg>
+      <span>Tetapan Sistem</span>
+    </button>
   </nav>
 
   <div class="sidebar-bottom">
@@ -133,9 +78,9 @@
 <div class="container">
 <section id="loginView" class="card login-card"><span>e-KOSSTA • MODEL B</span><h1>Log Masuk</h1><p class="muted">Ujian session + role authorization menggunakan data ujian sahaja.</p><label>Username</label><input id="username" autocomplete="username" placeholder="admin atau guru"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password ujian"><button id="loginBtn" class="btn primary full">Log Masuk</button><div class="demo"><b>Akaun ujian</b><br>ADMIN: admin / admin123<br>GURU: guru / guru123</div><div id="loginResult" class="result muted"></div></section>
 <section id="appView" hidden>
-<div id="dashboardHero" class="card hero page-section page-dashboard"><div><span>SELAMAT DATANG</span><h1>Dashboard</h1><p id="welcome" class="muted"></p></div><button id="logoutBtn" class="btn secondary">Log Keluar</button></div>
-<section id="dashboardGrid" class="grid page-section page-dashboard"><div class="card"><h2>🔐 Session</h2><div class="stats"><div class="stat"><b id="roleValue">-</b><small>Role</small></div><div class="stat"><b id="sessionState">ON</b><small>Session</small></div></div><button id="meBtn" class="btn secondary full">Semak Session</button><div id="meResult" class="result muted"></div></div>
-<div class="card"><h2>📊 Data Murid</h2><p class="muted">Akses hanya selepas session disahkan.</p><button id="loadBtn" class="btn primary full">Muat Data Murid</button><div class="stats"><div class="stat"><b id="muridCount">0</b><small>Murid</small></div></div></div></section>
+<div id="dashboardHero" class="card hero page-section page-dashboard"><div><span>SELAMAT DATANG</span><h1>Dashboard</h1><p id="welcome" class="muted"></p></div></div>
+<section id="dashboardGrid" class="grid page-section page-dashboard"><div class="card"><h2>📊 Data Murid</h2><p class="muted">Ringkasan data murid daripada sistem.</p><button id="loadBtn" class="btn primary full">Muat Data Murid</button><div class="stats"><div class="stat"><b id="muridCount">0</b><small>Murid</small></div></div></div>
+<div class="card"><h2>🏫 Unit Kokurikulum</h2><p class="muted">Ringkasan unit dan keahlian semasa.</p><button class="btn secondary full" type="button" data-page-jump="unit">Buka Unit Kokurikulum</button></div></section>
 <section id="muridSection" class="card page-section page-murid"><div class="head"><div><h2>👨‍🎓 Murid</h2><small class="muted">TEST_MURID</small></div><button id="refreshBtn" class="btn secondary">↻ Refresh</button></div><div id="tableWrap"><div class="empty">Belum ada data.</div></div></section>
 <section id="muridFormSection" class="card page-section page-murid"><h2>➕ Tambah Murid</h2><p class="muted">Fungsi ini tersedia untuk ADMIN dan GURU.</p><div class="form-grid"><div><label>Nama</label><input id="nama" placeholder="Ahmad Ali"></div><div><label>No KP Ujian</label><input id="noKp" placeholder="TEST004"></div><div><label>Jantina</label><select id="jantina"><option value="">-- Pilih --</option><option value="L">Lelaki</option><option value="P">Perempuan</option></select></div><div><label>Tingkatan</label><input id="tingkatan" placeholder="4"></div><div><label>Kelas</label><input id="kelas" placeholder="4 Amanah"></div></div><button id="addBtn" class="btn primary">Tambah ke Google Sheet</button><div id="addResult" class="result muted"></div></section>
 <section id="userSection" class="card page-section page-users" hidden>
@@ -194,8 +139,6 @@
   <div id="guruResult" class="result muted"></div>
   <div class="table-wrap"><div id="guruTableWrap"><div class="empty">Belum dimuatkan.</div></div></div>
 </section>
-<section id="systemInfo" class="card page-section page-dashboard"><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN/GURU boleh tambah murid; backend semak role.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
-</section></div></main>
 <section id="analysisSection" class="card page-section page-analysis" hidden>
   <div class="empty-state-large">
     <div class="empty-icon minimal-icon">▥</div>
@@ -210,12 +153,12 @@
     <div class="settings-row"><span>Integrasi Google Sheets</span><small>Kekalkan konfigurasi backend sedia ada.</small></div>
     <div class="settings-row"><span>Keselamatan</span><small>Authentication dan role authorization dikekalkan.</small></div>
   </div>
-</section>
+</section></section></div></main>
 <nav id="mobileNav" class="mobile-nav" aria-label="Navigasi mudah alih">
   <button class="nav-item active" data-page="dashboard" type="button"><span>⌂</span><span>Home</span></button>
   <button class="nav-item" data-page="unit" type="button"><span>◫</span><span>Unit</span></button>
   <button class="nav-item" data-page="murid" type="button"><span>○</span><span>Murid</span></button>
   <button class="nav-item" data-page="analysis" type="button"><span>▥</span><span>Analisis</span></button>
-  <button class="nav-item" data-page="users" type="button"><span>≡</span><span>Menu</span></button>
+  <button class="nav-item" data-page="dashboard" type="button"><span>≡</span><span>Menu</span></button>
 </nav>
 <div id="toast" class="toast"></div><script src="app.js"></script></body></html>
