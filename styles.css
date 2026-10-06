@@ -21,3 +21,211 @@ body{min-height:100vh}
 @media(max-width:768px){.sidebar{display:none}.app-shell{margin-left:0;padding-bottom:76px}.desktop-topbar{display:none}.mobile-topbar{display:flex;position:sticky;top:0;z-index:30;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface2);border-bottom:1px solid var(--border);backdrop-filter:blur(14px)}.mobile-topbar b{font-size:16px}.mobile-topbar small{display:block;color:var(--muted);font-size:10px;margin-top:1px}.app-shell .container{width:calc(100% - 14px);margin:12px auto 25px}.mobile-nav{position:fixed;display:flex;left:8px;right:8px;bottom:8px;height:62px;background:var(--surface2);border:1px solid var(--border);border-radius:19px;box-shadow:0 10px 35px rgba(0,0,0,.18);z-index:50;padding:5px}.mobile-nav .nav-item{margin:0;flex:1;justify-content:center;flex-direction:column;gap:2px;padding:5px 2px;font-size:9px;border-radius:14px}.mobile-nav .nav-item span:first-child{font-size:17px;width:auto}.mobile-nav .nav-item span:last-child{display:block}.mobile-nav .nav-item.active{color:var(--primary);background:var(--surface)}}
 @media(min-width:769px){.mobile-nav{display:none}}
 @media(max-width:760px){.hero h1{font-size:29px}.unit-summary{grid-template-columns:1fr 1fr}.unit-grid{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   e-KOSSTA UI PATCH V2.3
+   ========================================================= */
+
+body.logged-out .sidebar,
+body.logged-out .desktop-topbar,
+body.logged-out .mobile-nav{
+  display:none !important;
+}
+
+body.logged-out .app-shell{
+  margin-left:0 !important;
+}
+
+body.logged-out .app-shell .container{
+  width:min(560px,calc(100% - 28px));
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+}
+
+body.logged-out #loginView{
+  width:100%;
+}
+
+.sidebar{
+  overflow:hidden;
+}
+
+.side-nav{
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  padding-right:2px;
+}
+
+.side-nav::-webkit-scrollbar{
+  width:0;
+  height:0;
+  display:none;
+}
+
+.nav-item,
+.nav-group-toggle{
+  min-height:40px;
+}
+
+.nav-icon{
+  width:17px;
+  height:17px;
+  flex:0 0 17px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.nav-group{
+  margin:2px 0;
+}
+
+.nav-group-toggle{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border:0;
+  background:transparent;
+  color:#bdbcc7;
+  padding:10px 11px;
+  border-radius:11px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+  text-align:left;
+}
+
+.nav-group-toggle:hover{
+  background:rgba(255,255,255,.07);
+  color:#fff;
+}
+
+.nav-group-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.nav-chevron{
+  width:14px;
+  height:14px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition:transform .18s ease;
+}
+
+.nav-group.open > .nav-group-toggle .nav-chevron{
+  transform:rotate(90deg);
+}
+
+.nav-submenu{
+  display:none;
+  padding:2px 0 5px;
+}
+
+.nav-group.open > .nav-submenu{
+  display:block;
+}
+
+.nav-subitem{
+  min-height:36px;
+  padding:8px 11px 8px 38px;
+  font-size:11px;
+  font-weight:650;
+}
+
+.nav-subitem .nav-icon{
+  width:15px;
+  height:15px;
+  flex-basis:15px;
+}
+
+.nav-subtitle{
+  padding:9px 11px 4px 38px;
+  color:#696875;
+  font-size:8px;
+  letter-spacing:.11em;
+  font-weight:800;
+}
+
+.nav-group:has(.nav-item.active) > .nav-group-toggle{
+  color:#fff;
+}
+
+.settings-placeholder{
+  display:grid;
+  gap:10px;
+  margin-top:15px;
+}
+
+.settings-row{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:15px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:14px;
+}
+
+.settings-row span{
+  font-size:13px;
+  font-weight:750;
+}
+
+.settings-row small{
+  color:var(--muted);
+  font-size:11px;
+  text-align:right;
+}
+
+.minimal-icon{
+  color:var(--primary);
+}
+
+@media(max-width:1024px) and (min-width:769px){
+  .nav-group-toggle{
+    justify-content:center;
+    padding:11px;
+  }
+
+  .nav-group-left{
+    justify-content:center;
+  }
+
+  .nav-group-left>span:last-child,
+  .nav-group-toggle .nav-chevron,
+  .nav-submenu{
+    display:none !important;
+  }
+}
+
+@media(max-width:768px){
+  body.logged-out .app-shell{
+    padding-bottom:0;
+  }
+
+  body.logged-out .app-shell .container{
+    width:calc(100% - 24px);
+  }
+
+  .settings-row{
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .settings-row small{
+    text-align:left;
+  }
+}
