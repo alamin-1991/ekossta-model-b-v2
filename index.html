@@ -9,5 +9,17 @@
 <div class="card"><h2>📊 Data Murid</h2><p class="muted">Akses hanya selepas session disahkan.</p><button id="loadBtn" class="btn primary full">Muat Data Murid</button><div class="stats"><div class="stat"><b id="muridCount">0</b><small>Murid</small></div></div></div></section>
 <section class="card"><div class="head"><div><h2>👨‍🎓 Murid Ujian</h2><small class="muted">TEST_MURID</small></div><button id="refreshBtn" class="btn secondary">↻ Refresh</button></div><div id="tableWrap"><div class="empty">Belum ada data.</div></div></section>
 <section id="adminSection" class="card"><h2>➕ Tambah Murid Ujian</h2><p class="muted">Fungsi ini tersedia untuk ADMIN dan GURU.</p><div class="form-grid"><div><label>Nama</label><input id="nama" placeholder="Ahmad Ali"></div><div><label>No KP Ujian</label><input id="noKp" placeholder="TEST004"></div><div><label>Tingkatan</label><input id="tingkatan" placeholder="4"></div><div><label>Kelas</label><input id="kelas" placeholder="4 Amanah"></div></div><button id="addBtn" class="btn primary">Tambah ke Google Sheet</button><div id="addResult" class="result muted"></div></section>
-<section class="card"><h2>🛡️ Apa yang diuji dalam V2?</h2><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN dan GURU boleh tambah murid; role lain ditolak oleh backend.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
+<section id="userSection" class="card" hidden>
+  <div class="head"><div><h2>👥 Pengurusan Pengguna</h2><small class="muted">ADMIN sahaja • TEST_USERS</small></div><button id="usersRefreshBtn" class="btn secondary">↻ Refresh</button></div>
+  <div class="form-grid user-form-grid">
+    <div><label>Username</label><input id="newUsername" placeholder="contoh: guru2"></div>
+    <div><label>Nama</label><input id="newUserNama" placeholder="Nama pengguna"></div>
+    <div><label>Role</label><select id="newUserRole"><option value="GURU">GURU</option><option value="ADMIN">ADMIN</option></select></div>
+    <div><label>Password</label><input id="newUserPassword" type="password" placeholder="Minimum 8 aksara"></div>
+  </div>
+  <button id="addUserBtn" class="btn primary">+ Tambah Pengguna</button>
+  <div id="userResult" class="result muted"></div>
+  <div id="usersTableWrap" class="table-wrap"><div class="empty">Belum dimuatkan.</div></div>
+</section>
+<section class="card"><h2>🛡️ Apa yang diuji dalam V2?</h2><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN boleh tambah murid; GURU hanya baca.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
 </section></main><div id="toast" class="toast"></div><script src="app.js"></script></body></html>
