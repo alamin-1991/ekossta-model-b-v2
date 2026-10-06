@@ -409,3 +409,41 @@ body.mobile-menu-open{overflow:hidden}
     padding-left:5px;
   }
 }
+
+
+/* =========================================================
+   PATCH: SURFACE PRO / TABLET SIDEBAR LABELS
+   Kekalkan teks menu utama; popup submenu tidak disentuh.
+   ========================================================= */
+@media(max-width:1024px) and (min-width:769px){
+  .sidebar{width:228px;padding-inline:10px;}
+  .app-shell{margin-left:228px;}
+
+  .nav-group-toggle{
+    justify-content:flex-start;
+    padding:10px 11px;
+  }
+
+  .nav-group-left{
+    justify-content:flex-start;
+  }
+
+  /* Nama menu utama mesti kekal kelihatan */
+  .nav-group-left>span:last-child{
+    display:inline !important;
+  }
+
+  .nav-group-toggle .nav-chevron{
+    display:inline-block !important;
+  }
+
+  /* Submenu kekal popup — jangan buka secara menegak */
+  .nav-group > .nav-submenu{
+    display:none;
+  }
+
+  .nav-group.desktop-popup-open > .nav-submenu,
+  .nav-group.open.desktop-popup-open > .nav-submenu{
+    display:block !important;
+  }
+}
