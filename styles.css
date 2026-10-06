@@ -463,3 +463,85 @@ body.mobile-menu-open{overflow:hidden}
   cursor:pointer;
 }
 .mobile-logout-btn:hover{background:var(--surface2);color:#ef8d8d}
+
+/* =========================================================
+   PATCH V2.3 — MOBILE BOTTOM NAVIGATION
+   LIGHT MODE: purple gradient / floating pill
+   DARK MODE: preserve original e-KOSSTA dark palette
+   Desktop / tablet / popup submenu untouched.
+   ========================================================= */
+@media (max-width:768px){
+  .mobile-nav{
+    left:10px;
+    right:10px;
+    bottom:10px;
+    height:68px;
+    padding:6px;
+    border:0;
+    border-radius:22px;
+    background:linear-gradient(135deg,#5B2EEA 0%,#6D3FE8 48%,#8B5CF6 100%);
+    box-shadow:0 12px 30px rgba(91,46,234,.28),0 4px 12px rgba(30,20,60,.12);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+
+  .mobile-nav .nav-item,
+  .mobile-nav .nav-item:hover,
+  .mobile-nav .nav-item.active{
+    min-height:54px;
+    margin:0;
+    flex:1;
+    justify-content:center;
+    flex-direction:column;
+    gap:3px;
+    padding:5px 2px;
+    border:0;
+    border-radius:17px;
+    background:transparent;
+    color:rgba(255,255,255,.78);
+    box-shadow:none;
+  }
+
+  .mobile-nav .nav-item.active{
+    color:#fff;
+    background:rgba(255,255,255,.13);
+  }
+
+  .mobile-nav .nav-item span:first-child{
+    width:auto;
+    font-size:17px;
+    line-height:1;
+    color:currentColor;
+  }
+
+  .mobile-nav .nav-item span:last-child{
+    display:block;
+    font-size:9px;
+    line-height:1.1;
+    font-weight:700;
+    color:currentColor;
+    white-space:nowrap;
+  }
+
+  .mobile-nav .nav-item:active{
+    transform:scale(.97);
+  }
+
+  /* Dark mode: same shape, original dark e-KOSSTA colours */
+  html.dark .mobile-nav{
+    background:var(--surface2);
+    border:1px solid var(--border);
+    box-shadow:0 10px 35px rgba(0,0,0,.30);
+  }
+
+  html.dark .mobile-nav .nav-item,
+  html.dark .mobile-nav .nav-item:hover{
+    color:var(--muted);
+    background:transparent;
+  }
+
+  html.dark .mobile-nav .nav-item.active{
+    color:var(--primary);
+    background:var(--surface);
+  }
+}
