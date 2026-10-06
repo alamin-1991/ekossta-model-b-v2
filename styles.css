@@ -477,10 +477,10 @@ body.mobile-menu-open{overflow:hidden}
     bottom:10px;
     height:68px;
     padding:6px;
-    border:0;
+    border:1px solid rgba(255,255,255,.08);
     border-radius:22px;
-    background:linear-gradient(135deg,#5B2EEA 0%,#6D3FE8 48%,#8B5CF6 100%);
-    box-shadow:0 12px 30px rgba(91,46,234,.28),0 4px 12px rgba(30,20,60,.12);
+    background:#18191f;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
   }
