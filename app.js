@@ -21,12 +21,10 @@ function positionSidebarPopup_(group){
   const toggle=group.querySelector(':scope > .nav-group-toggle');
   const menu=group.querySelector(':scope > .nav-submenu');
   if(!toggle || !menu)return;
-
   const r=toggle.getBoundingClientRect();
   const gap=8;
   const width=Math.min(260, Math.max(220, window.innerWidth-r.right-gap-14));
   const maxHeight=Math.max(220, window.innerHeight-24);
-
   menu.style.left=Math.round(r.right+gap)+'px';
   menu.style.top=Math.round(Math.max(12, Math.min(r.top, window.innerHeight-maxHeight-12)))+'px';
   menu.style.width=Math.round(width)+'px';
@@ -49,7 +47,6 @@ function setupNavigation(){
       e.stopPropagation();
       const group=btn.closest('.nav-group');
       if(!group)return;
-
       if(isDesktopSidebar_()){
         const opening=!group.classList.contains('desktop-popup-open');
         closeSidebarPopups_(opening?group:null);
@@ -63,6 +60,8 @@ function setupNavigation(){
       }
     });
   });
+
+  setupMobileMenu_();
 
   document.addEventListener('click',e=>{
     if(isDesktopSidebar_() && !e.target.closest('#sidebar'))closeSidebarPopups_();
@@ -94,6 +93,79 @@ function setupNavigation(){
   const lo=$('sidebarLogoutBtn');
   if(lo)lo.onclick=logout;
 }
+
+function setupMobileMenu_(){
+  const mobileNav=$('mobileNav');
+  const drawer=$('mobileMenu');
+  const content=$('mobileMenuContent');
+  if(!mobileNav||!drawer||!content)return;
+
+  const openMenu=()=>{
+    buildMobileMenu_();
+    drawer.hidden=false;
+    drawer.setAttribute('aria-hidden','false');
+    document.body.classList.add('mobile-menu-open');
+    requestAnimationFrame(()=>drawer.classList.add('show'));
+  };
+  const closeMenu=()=>{
+    drawer.classList.remove('show');
+    drawer.setAttribute('aria-hidden','true');
+    document.body.classList.remove('mobile-menu-open');
+    setTimeout(()=>{drawer.hidden=true;},180);
+  };
+
+  mobileNav.querySelectorAll('[data-mobile-open-group]').forEach(btn=>btn.addEventListener('click',()=>openMenu()));
+  mobileNav.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.page)));
+  drawer.querySelectorAll('[data-mobile-close]').forEach(el=>el.addEventListener('click',closeMenu));
+  drawer.addEventListener('click',e=>{
+    const groupBtn=e.target.closest('.mobile-group-toggle');
+    if(groupBtn){
+      const group=groupBtn.closest('.mobile-menu-group');
+      if(!group)return;
+      group.classList.toggle('open');
+      groupBtn.setAttribute('aria-expanded',group.classList.contains('open')?'true':'false');
+      return;
+    }
+    const item=e.target.closest('[data-mobile-page]');
+    if(item){
+      showPage(item.dataset.mobilePage);
+      closeMenu();
+    }
+  });
+  drawer.addEventListener('click',e=>{
+    if(e.target===drawer)closeMenu();
+  });
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closeMenu();});
+}
+
+function buildMobileMenu_(){
+  const content=$('mobileMenuContent');
+  if(!content)return;
+  const role=state.user?.role||'';
+  const activePage=document.querySelector('.nav-item.active')?.dataset.page||'dashboard';
+  const canAdmin=role==='ADMIN';
+  const groups=[
+    {key:'kokurikulum',label:'Kokurikulum',icon:'◫',items:[
+      ['unit','Unit Kokurikulum',''],['penempatan','Penempatan Unit',''],['kehadiran','Kehadiran','V2.4'],['aktiviti','Aktiviti & Acara','V2.5'],['peserta','Peserta Aktiviti',''],['pencapaian','Pencapaian','V2.6']
+    ]},
+    {key:'laporan',label:'Laporan',icon:'▤',items:[['reports','Laporan Aktiviti',''],['galeri','Galeri','']]},
+    {key:'tetapan',label:'Tetapan',icon:'≡',items:[['system-settings','Tetapan Sistem',''],['guru','Guru',''],['murid','Murid',''],['users','Pengurusan Pengguna','']]}
+  ];
+  const allowed=page=>{
+    if(['guru','users','system-settings'].includes(page))return canAdmin;
+    return ['unit','penempatan','murid','reports'].includes(page);
+  };
+  const isDisabled=page=>!allowed(page)||['kehadiran','aktiviti','peserta','pencapaian','galeri'].includes(page);
+  content.innerHTML=`<button class="mobile-main-link ${activePage==='dashboard'?'active':''}" data-mobile-page="dashboard"><span>⌂</span><b>Dashboard</b></button>`+
+    groups.map(g=>`<div class="mobile-menu-group ${g.items.some(x=>x[0]===activePage)?'open':''}">
+      <button class="mobile-group-toggle" type="button" aria-expanded="${g.items.some(x=>x[0]===activePage)?'true':'false'}"><span><i>${g.icon}</i>${g.label}</span><b>›</b></button>
+      <div class="mobile-group-items">${g.items.map(([page,label,badge])=>{
+        const disabled=isDisabled(page);
+        return `<button class="mobile-menu-item ${activePage===page?'active':''} ${disabled?'disabled':''}" data-mobile-page="${page}" type="button" ${disabled?'disabled':''}><span>${label}</span>${badge?`<em>${badge}</em>`:''}</button>`;
+      }).join('')}</div>
+    </div>`).join('');
+}
+
 function showPage(page){
   const role=state.user?.role||'';
 
@@ -133,6 +205,7 @@ function showPage(page){
     if(e)e.textContent=title;
   });
 
+  if($('mobileMenu') && !$('mobileMenu').hidden) buildMobileMenu_();
 
   if(page==='dashboard'){loadMurid();loadUnit();}
   if(page==='murid')loadMurid();
@@ -140,7 +213,7 @@ function showPage(page){
   if(page==='unit')loadUnit();
   if(page==='users')loadUsers();
 
-  // Pastikan submenu induk tersedia apabila halaman anak dipilih.
+  // Pastikan submenu induk terbuka apabila halaman anak dipilih.
   const active=document.querySelector('.nav-item[data-page="'+page+'"]');
   if(active){
     document.querySelectorAll('.nav-group').forEach(g=>{
@@ -148,11 +221,6 @@ function showPage(page){
         g.classList.add('open');
         const t=g.querySelector(':scope > .nav-group-toggle');
         if(t)t.setAttribute('aria-expanded','true');
-        if(isDesktopSidebar_()){
-          closeSidebarPopups_(g);
-          g.classList.add('desktop-popup-open');
-          requestAnimationFrame(()=>positionSidebarPopup_(g));
-        }
       }
     });
   }
