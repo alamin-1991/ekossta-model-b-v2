@@ -1,6 +1,32 @@
 const $=id=>document.getElementById(id);
 const state={apiUrl:localStorage.getItem('ekossta_model_b_api_url')||'',dark:localStorage.getItem('ekossta_model_b_dark')==='1',token:sessionStorage.getItem('ekossta_v2_token')||'',user:JSON.parse(sessionStorage.getItem('ekossta_v2_user')||'null')};
-function init(){if(state.dark){document.documentElement.classList.add('dark');$('themeBtn').textContent='☀️'}$('themeBtn').onclick=toggleTheme;$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('meBtn').onclick=me;$('loadBtn').onclick=loadMurid;$('refreshBtn').onclick=loadMurid;$('addBtn').onclick=addMurid;$('addUserBtn').onclick=addUser;$('usersRefreshBtn').onclick=loadUsers;$('guruRefreshBtn').onclick=loadGuru;$('addGuruBtn').onclick=saveGuru;$('cancelGuruBtn').onclick=cancelGuru;$('unitRefreshBtn').onclick=loadUnit;$('addUnitBtn').onclick=saveUnit;$('cancelUnitBtn').onclick=cancelUnit;$('addMemberBtn').onclick=addUnitMember;if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(console.warn);if(state.token&&state.user)showApp();else showLogin()}
+
+function setupNavigation(){
+  const buttons=[...document.querySelectorAll('.nav-item[data-page]')];
+  buttons.forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.page)));
+  document.querySelectorAll('[data-page-jump]').forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.pageJump)));
+  const themeTargets=['themeBtn','desktopThemeBtn','sidebarThemeBtn'];
+  themeTargets.forEach(id=>{const e=$(id);if(e)e.onclick=toggleTheme;});
+  const lo=$('sidebarLogoutBtn'); if(lo)lo.onclick=logout;
+}
+function showPage(page){
+  const role=state.user?.role||'';
+  if(page==='users' && role!=='ADMIN')return toast('Akses ditolak.');
+  if(page==='guru' && role!=='ADMIN')return toast('Akses ditolak.');
+  const map={dashboard:'Dashboard',murid:'Murid',guru:'Guru',unit:'Unit Kokurikulum',penempatan:'Penempatan Unit',users:'Pengurusan Pengguna'};
+  document.querySelectorAll('.page-section').forEach(el=>el.hidden=true);
+  document.querySelectorAll('.nav-item[data-page]').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
+  document.querySelectorAll('.page-'+page).forEach(el=>el.hidden=false);
+  const title=map[page]||'Dashboard';
+  ['desktopPageTitle','mobilePageTitle'].forEach(id=>{const e=$(id);if(e)e.textContent=title;});
+  if(page==='dashboard'){loadMurid();loadUnit();}
+  if(page==='murid')loadMurid();
+  if(page==='guru')loadGuru();
+  if(page==='unit')loadUnit();
+  if(page==='users')loadUsers();
+}
+
+function init(){if(state.dark){document.documentElement.classList.add('dark');['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{if($(id))$(id).textContent='☀️'})}setupNavigation();$('themeBtn').onclick=toggleTheme;$('loginBtn').onclick=login;$('logoutBtn').onclick=logout;$('meBtn').onclick=me;$('loadBtn').onclick=loadMurid;$('refreshBtn').onclick=loadMurid;$('addBtn').onclick=addMurid;$('addUserBtn').onclick=addUser;$('usersRefreshBtn').onclick=loadUsers;$('guruRefreshBtn').onclick=loadGuru;$('addGuruBtn').onclick=saveGuru;$('cancelGuruBtn').onclick=cancelGuru;$('unitRefreshBtn').onclick=loadUnit;$('addUnitBtn').onclick=saveUnit;$('cancelUnitBtn').onclick=cancelUnit;$('addMemberBtn').onclick=addUnitMember;if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js').catch(console.warn);if(state.token&&state.user)showApp();else showLogin()}
 function apiGet(action,params={}){return new Promise((resolve,reject)=>{let u;try{u=new URL(state.apiUrl||prompt('Masukkan URL Apps Script /exec'))}catch(e){reject(Error('URL backend tidak sah.'));return}if(!state.apiUrl){state.apiUrl=u.toString();localStorage.setItem('ekossta_model_b_api_url',state.apiUrl)}const cb='__ekossta_v2_'+Date.now()+'_'+Math.random().toString(36).slice(2),q=new URLSearchParams({action,callback:cb,...params}),s=document.createElement('script');s.src=u.origin+u.pathname+'?'+q;s.async=true;let timer;window[cb]=data=>{clearTimeout(timer);delete window[cb];s.remove();data&&data.ok===false?reject(Error(data.error||'Backend error.')):resolve(data)};s.onerror=()=>{clearTimeout(timer);delete window[cb];s.remove();reject(Error('Gagal menghubungi Apps Script.'))};timer=setTimeout(()=>{delete window[cb];s.remove();reject(Error('Backend timeout.'))},15000);document.head.appendChild(s)})}
 async function login(){const b=$('loginBtn'),username=$('username').value.trim(),password=$('password').value;if(!username||!password)return toast('Masukkan username dan password.');if(!state.apiUrl){const u=prompt('Masukkan URL Apps Script /exec');if(!u)return;if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(u.trim()))return toast('URL /exec tidak sah.');state.apiUrl=u.trim();localStorage.setItem('ekossta_model_b_api_url',state.apiUrl)}b.disabled=true;b.textContent='⏳ Mengesahkan...';try{const d=await apiGet('login',{username,password});state.token=d.token;state.user=d.user;sessionStorage.setItem('ekossta_v2_token',state.token);sessionStorage.setItem('ekossta_v2_user',JSON.stringify(state.user));$('password').value='';showApp();toast('Login berjaya.')}catch(e){$('loginResult').textContent=e.message;toast(e.message)}finally{b.disabled=false;b.textContent='Log Masuk'}}
 async function logout(){try{if(state.token)await apiGet('logout',{token:state.token})}catch(e){}state.token='';state.user=null;sessionStorage.removeItem('ekossta_v2_token');sessionStorage.removeItem('ekossta_v2_user');showLogin();toast('Logout berjaya.')}
@@ -118,7 +144,7 @@ async function toggleUnit(unitId,status){try{const d=await apiGet('setUnitStatus
 async function addUnitMember(){const b=$('addMemberBtn'),p={token:state.token,unitId:$('memberUnit').value,noKp:$('memberMurid').value,tahun:$('memberTahun').value};if(!p.unitId||!p.noKp||!p.tahun)return toast('Lengkapkan Unit, Murid dan Tahun.');b.disabled=true;try{const d=await apiGet('addUnitMember',p);$('memberResult').textContent=d.message;await loadUnit();toast(d.message)}catch(e){$('memberResult').textContent=e.message;toast(e.message)}finally{b.disabled=false}}
 async function viewUnitMembers(unitId){try{const d=await apiGet('getUnitMembers',{token:state.token,unitId});const rows=d.data||[];const r=UNIT_ROWS.find(x=>String(x.UNIT_ID)===String(unitId));if(!rows.length)return alert(`Ahli ${r?.NAMA_UNIT||'unit'} belum ada.`);const text=rows.map((x,i)=>`${i+1}. ${x.NAMA} — ${x.JANTINA} — ${x.NO_KP}`).join('\n');alert(`AHLI: ${r?.NAMA_UNIT||unitId}\n\n${text}`)}catch(e){toast(e.message)}}
 function showLogin(){$('loginView').hidden=false;$('appView').hidden=true}
-function showApp(){$('loginView').hidden=true;$('appView').hidden=false;$('welcome').textContent=`Selamat datang, ${state.user?.nama||state.user?.username||''}.`;$('roleValue').textContent=state.user?.role||'-';const isAdmin=state.user?.role==='ADMIN';$('adminSection').hidden=!['ADMIN','GURU'].includes(state.user?.role);$('userSection').hidden=!isAdmin;$('guruSection').hidden=!isAdmin;$('unitSection').hidden=false;$('unitAdminArea').hidden=!isAdmin;loadMurid();loadUnit();if(isAdmin){loadUsers();loadGuru();}}
-function toggleTheme(){state.dark=!state.dark;document.documentElement.classList.toggle('dark',state.dark);localStorage.setItem('ekossta_model_b_dark',state.dark?'1':'0');$('themeBtn').textContent=state.dark?'☀️':'🌙'}
+function showApp(){$('loginView').hidden=true;$('appView').hidden=false;$('welcome').textContent=`Selamat datang, ${state.user?.nama||state.user?.username||''}.`;$('roleValue').textContent=state.user?.role||'-';const isAdmin=state.user?.role==='ADMIN';$('adminSection').hidden=!['ADMIN','GURU'].includes(state.user?.role);$('userSection').hidden=!isAdmin;$('guruSection').hidden=!isAdmin;$('unitSection').hidden=false;$('unitAdminArea').hidden=!isAdmin;$('sideUserName').textContent=state.user?.nama||state.user?.username||'Pengguna';$('sideUserRole').textContent=state.user?.role||'-';$('desktopUser').textContent=state.user?.nama||state.user?.username||'-';showPage('dashboard');if(isAdmin){loadUsers();loadGuru();}}
+function toggleTheme(){state.dark=!state.dark;document.documentElement.classList.toggle('dark',state.dark);localStorage.setItem('ekossta_model_b_dark',state.dark?'1':'0');['themeBtn','desktopThemeBtn','sidebarThemeBtn'].forEach(id=>{const e=$(id);if(e)e.textContent=state.dark?'☀️':'🌙'})}
 function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),3200)}
 document.addEventListener('DOMContentLoaded',init);

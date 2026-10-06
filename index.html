@@ -1,15 +1,47 @@
 <!doctype html>
 <html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#5B3FD0"><meta name="description" content="e-KOSSTA Model B V2 security prototype"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css"><title>e-KOSSTA Model B V2</title></head>
-<body><header class="topbar"><div><b>e-KOSSTA</b><small>Model B • V2 Security Prototype</small></div><button id="themeBtn">🌙</button></header>
-<main class="container">
-<section id="loginView" class="card login-card"><span>MODEL B V2</span><h1>Log Masuk</h1><p class="muted">Ujian session + role authorization menggunakan data ujian sahaja.</p><label>Username</label><input id="username" autocomplete="username" placeholder="admin atau guru"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password ujian"><button id="loginBtn" class="btn primary full">Log Masuk</button><div class="demo"><b>Akaun ujian</b><br>ADMIN: admin / admin123<br>GURU: guru / guru123</div><div id="loginResult" class="result muted"></div></section>
+<body>
+<header class="mobile-topbar">
+  <div><b>e-KOSSTA</b><small id="mobilePageTitle">Dashboard</small></div>
+  <button id="themeBtn">🌙</button>
+</header>
+<aside id="sidebar" class="sidebar">
+  <div class="brand"><div class="brand-mark">e</div><div><b>e-KOSSTA</b><small>Sistem Kokurikulum</small></div></div>
+  <nav class="side-nav" aria-label="Menu utama">
+    <button class="nav-item active" data-page="dashboard"><span>🏠</span><span>Dashboard</span></button>
+    <div class="nav-label">PENGURUSAN DATA</div>
+    <button class="nav-item" data-page="murid"><span>👨‍🎓</span><span>Murid</span></button>
+    <button class="nav-item" data-page="guru"><span>👨‍🏫</span><span>Guru</span></button>
+    <button class="nav-item" data-page="unit"><span>🏫</span><span>Unit Kokurikulum</span></button>
+    <button class="nav-item" data-page="penempatan"><span>👥</span><span>Penempatan Unit</span></button>
+    <div class="nav-label">KOKURIKULUM</div>
+    <button class="nav-item disabled" type="button" title="Modul akan datang"><span>✓</span><span>Kehadiran</span><em>V2.4</em></button>
+    <button class="nav-item disabled" type="button" title="Modul akan datang"><span>📅</span><span>Aktiviti</span><em>V2.5</em></button>
+    <button class="nav-item disabled" type="button" title="Modul akan datang"><span>🏆</span><span>Pencapaian</span><em>V2.6</em></button>
+    <div class="nav-label">ANALISIS & SISTEM</div>
+    <button class="nav-item disabled" type="button" title="Modul akan datang"><span>📊</span><span>Analisis</span><em>Coming</em></button>
+    <button class="nav-item admin-nav" data-page="users"><span>👥</span><span>Pengguna</span></button>
+  </nav>
+  <div class="sidebar-bottom">
+    <button id="sidebarThemeBtn" class="nav-item" type="button"><span>🌙</span><span>Tukar Tema</span></button>
+    <button id="sidebarLogoutBtn" class="nav-item danger-nav" type="button"><span>🚪</span><span>Log Keluar</span></button>
+    <div class="profile-mini"><span class="avatar">U</span><div><b id="sideUserName">Pengguna</b><small id="sideUserRole">-</small></div></div>
+  </div>
+</aside>
+<main class="app-shell">
+  <div class="desktop-topbar">
+    <div><span class="breadcrumb">e-KOSSTA</span><strong id="desktopPageTitle">Dashboard</strong></div>
+    <div class="top-actions"><span id="desktopUser" class="user-chip">-</span><button id="desktopThemeBtn" class="icon-btn" type="button">🌙</button><button id="logoutBtn" class="btn secondary">Log Keluar</button></div>
+  </div>
+<div class="container">
+<section id="loginView" class="card login-card"><span>e-KOSSTA • MODEL B</span><h1>Log Masuk</h1><p class="muted">Ujian session + role authorization menggunakan data ujian sahaja.</p><label>Username</label><input id="username" autocomplete="username" placeholder="admin atau guru"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password ujian"><button id="loginBtn" class="btn primary full">Log Masuk</button><div class="demo"><b>Akaun ujian</b><br>ADMIN: admin / admin123<br>GURU: guru / guru123</div><div id="loginResult" class="result muted"></div></section>
 <section id="appView" hidden>
-<div class="card hero"><div><span>BERJAYA LOGIN</span><h1>Dashboard Model B</h1><p id="welcome" class="muted"></p></div><button id="logoutBtn" class="btn secondary">Log Keluar</button></div>
-<section class="grid"><div class="card"><h2>🔐 Session</h2><div class="stats"><div class="stat"><b id="roleValue">-</b><small>Role</small></div><div class="stat"><b id="sessionState">ON</b><small>Session</small></div></div><button id="meBtn" class="btn secondary full">Semak Session</button><div id="meResult" class="result muted"></div></div>
+<div id="dashboardHero" class="card hero page-section page-dashboard"><div><span>SELAMAT DATANG</span><h1>Dashboard</h1><p id="welcome" class="muted"></p></div><button id="logoutBtn" class="btn secondary">Log Keluar</button></div>
+<section id="dashboardGrid" class="grid page-section page-dashboard"><div class="card"><h2>🔐 Session</h2><div class="stats"><div class="stat"><b id="roleValue">-</b><small>Role</small></div><div class="stat"><b id="sessionState">ON</b><small>Session</small></div></div><button id="meBtn" class="btn secondary full">Semak Session</button><div id="meResult" class="result muted"></div></div>
 <div class="card"><h2>📊 Data Murid</h2><p class="muted">Akses hanya selepas session disahkan.</p><button id="loadBtn" class="btn primary full">Muat Data Murid</button><div class="stats"><div class="stat"><b id="muridCount">0</b><small>Murid</small></div></div></div></section>
-<section class="card"><div class="head"><div><h2>👨‍🎓 Murid Ujian</h2><small class="muted">TEST_MURID</small></div><button id="refreshBtn" class="btn secondary">↻ Refresh</button></div><div id="tableWrap"><div class="empty">Belum ada data.</div></div></section>
-<section id="adminSection" class="card"><h2>➕ Tambah Murid Ujian</h2><p class="muted">Fungsi ini tersedia untuk ADMIN dan GURU.</p><div class="form-grid"><div><label>Nama</label><input id="nama" placeholder="Ahmad Ali"></div><div><label>No KP Ujian</label><input id="noKp" placeholder="TEST004"></div><div><label>Jantina</label><select id="jantina"><option value="">-- Pilih --</option><option value="L">Lelaki</option><option value="P">Perempuan</option></select></div><div><label>Tingkatan</label><input id="tingkatan" placeholder="4"></div><div><label>Kelas</label><input id="kelas" placeholder="4 Amanah"></div></div><button id="addBtn" class="btn primary">Tambah ke Google Sheet</button><div id="addResult" class="result muted"></div></section>
-<section id="userSection" class="card" hidden>
+<section id="muridSection" class="card page-section page-murid"><div class="head"><div><h2>👨‍🎓 Murid</h2><small class="muted">TEST_MURID</small></div><button id="refreshBtn" class="btn secondary">↻ Refresh</button></div><div id="tableWrap"><div class="empty">Belum ada data.</div></div></section>
+<section id="muridFormSection" class="card page-section page-murid"><h2>➕ Tambah Murid</h2><p class="muted">Fungsi ini tersedia untuk ADMIN dan GURU.</p><div class="form-grid"><div><label>Nama</label><input id="nama" placeholder="Ahmad Ali"></div><div><label>No KP Ujian</label><input id="noKp" placeholder="TEST004"></div><div><label>Jantina</label><select id="jantina"><option value="">-- Pilih --</option><option value="L">Lelaki</option><option value="P">Perempuan</option></select></div><div><label>Tingkatan</label><input id="tingkatan" placeholder="4"></div><div><label>Kelas</label><input id="kelas" placeholder="4 Amanah"></div></div><button id="addBtn" class="btn primary">Tambah ke Google Sheet</button><div id="addResult" class="result muted"></div></section>
+<section id="userSection" class="card page-section page-users" hidden>
   <div class="head"><div><h2>👥 Pengurusan Pengguna</h2><small class="muted">ADMIN sahaja • TEST_USERS</small></div><button id="usersRefreshBtn" class="btn secondary">↻ Refresh</button></div>
   <div class="form-grid user-form-grid">
     <div><label>Username</label><input id="newUsername" placeholder="contoh: guru2"></div>
@@ -23,7 +55,7 @@
 </section>
 
 
-<section id="unitSection" class="card" hidden>
+<section id="unitSection" class="card page-section page-unit" hidden>
   <div class="head"><div><h2>🏫 Unit Kokurikulum</h2><small class="muted">V2.3 • UNIT + PENEMPATAN AHLI</small></div><button id="unitRefreshBtn" class="btn secondary">↻ Refresh</button></div>
   <div id="unitSummary" class="unit-summary"></div>
   <div id="unitAdminArea" hidden>
@@ -46,7 +78,10 @@
   <div id="unitCards" class="unit-grid"></div>
   <div id="unitTableWrap" class="table-wrap"></div>
 </section>
-<section id="guruSection" class="card" hidden>
+<section id="penempatanSection" class="card page-section page-penempatan" hidden>
+  <div class="empty-state-large"><div class="empty-icon">👥</div><h2>Penempatan Unit</h2><p class="muted">Paparan penempatan akan dibina dalam patch modul seterusnya. Fungsi tambah ahli unit V2.3 tersedia melalui halaman <b>Unit Kokurikulum</b>.</p><button class="btn primary" type="button" data-page-jump="unit">Buka Unit Kokurikulum</button></div>
+</section>
+<section id="guruSection" class="card page-section page-guru" hidden>
   <div class="head"><div><h2>👨‍🏫 Pengurusan Guru</h2><small class="muted">ADMIN sahaja • TEST_GURU</small></div><button id="guruRefreshBtn" class="btn secondary">↻ Refresh</button></div>
   <div class="form-grid guru-form-grid">
     <div><label>No. Guru</label><input id="guruNo" placeholder="G001"></div>
@@ -62,5 +97,13 @@
   <div id="guruResult" class="result muted"></div>
   <div class="table-wrap"><div id="guruTableWrap"><div class="empty">Belum dimuatkan.</div></div></div>
 </section>
-<section class="card"><h2>🛡️ Apa yang diuji dalam V2?</h2><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN/GURU boleh tambah murid; backend semak role.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
-</section></main><div id="toast" class="toast"></div><script src="app.js"></script></body></html>
+<section id="systemInfo" class="card page-section page-dashboard"><ol><li>Login username/password.</li><li>Password disimpan sebagai hash SHA-256, bukan teks biasa.</li><li>Session token tamat selepas 6 jam.</li><li>Role ADMIN/GURU diperiksa di backend.</li><li>ADMIN/GURU boleh tambah murid; backend semak role.</li><li>Aktiviti login/tambah direkodkan dalam TEST_LOG.</li></ol><p class="warning">V2 ini masih prototype kerana lapisan cross-origin menggunakan GET/JSONP. Jangan gunakan data murid sebenar. V3 akan menggantikan lapisan ini dengan autentikasi/API production.</p></section>
+</section></div></main>
+<nav id="mobileNav" class="mobile-nav" aria-label="Navigasi mudah alih">
+  <button class="nav-item active" data-page="dashboard"><span>🏠</span><span>Home</span></button>
+  <button class="nav-item" data-page="murid"><span>👨‍🎓</span><span>Murid</span></button>
+  <button class="nav-item" data-page="unit"><span>🏫</span><span>Unit</span></button>
+  <button class="nav-item" data-page="guru"><span>👨‍🏫</span><span>Guru</span></button>
+  <button class="nav-item" data-page="users"><span>☰</span><span>Menu</span></button>
+</nav>
+<div id="toast" class="toast"></div><script src="app.js"></script></body></html>
