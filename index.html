@@ -8,7 +8,7 @@
 <section class="grid"><div class="card"><h2>🔐 Session</h2><div class="stats"><div class="stat"><b id="roleValue">-</b><small>Role</small></div><div class="stat"><b id="sessionState">ON</b><small>Session</small></div></div><button id="meBtn" class="btn secondary full">Semak Session</button><div id="meResult" class="result muted"></div></div>
 <div class="card"><h2>📊 Data Murid</h2><p class="muted">Akses hanya selepas session disahkan.</p><button id="loadBtn" class="btn primary full">Muat Data Murid</button><div class="stats"><div class="stat"><b id="muridCount">0</b><small>Murid</small></div></div></div></section>
 <section class="card"><div class="head"><div><h2>👨‍🎓 Murid Ujian</h2><small class="muted">TEST_MURID</small></div><button id="refreshBtn" class="btn secondary">↻ Refresh</button></div><div id="tableWrap"><div class="empty">Belum ada data.</div></div></section>
-<section id="adminSection" class="card"><h2>➕ Tambah Murid Ujian</h2><p class="muted">Fungsi ini tersedia untuk ADMIN dan GURU.</p><div class="form-grid"><div><label>Nama</label><input id="nama" placeholder="Ahmad Ali"></div><div><label>No KP Ujian</label><input id="noKp" placeholder="TEST004"></div><div><label>Tingkatan</label><input id="tingkatan" placeholder="4"></div><div><label>Kelas</label><input id="kelas" placeholder="4 Amanah"></div></div><button id="addBtn" class="btn primary">Tambah ke Google Sheet</button><div id="addResult" class="result muted"></div></section>
+<section id="adminSection" class="card"><h2>➕ Tambah Murid Ujian</h2><p class="muted">Fungsi ini tersedia untuk ADMIN dan GURU.</p><div class="form-grid"><div><label>Nama</label><input id="nama" placeholder="Ahmad Ali"></div><div><label>No KP Ujian</label><input id="noKp" placeholder="TEST004"></div><div><label>Jantina</label><select id="jantina"><option value="">-- Pilih --</option><option value="L">Lelaki</option><option value="P">Perempuan</option></select></div><div><label>Tingkatan</label><input id="tingkatan" placeholder="4"></div><div><label>Kelas</label><input id="kelas" placeholder="4 Amanah"></div></div><button id="addBtn" class="btn primary">Tambah ke Google Sheet</button><div id="addResult" class="result muted"></div></section>
 <section id="userSection" class="card" hidden>
   <div class="head"><div><h2>👥 Pengurusan Pengguna</h2><small class="muted">ADMIN sahaja • TEST_USERS</small></div><button id="usersRefreshBtn" class="btn secondary">↻ Refresh</button></div>
   <div class="form-grid user-form-grid">
@@ -22,6 +22,30 @@
   <div id="usersTableWrap" class="table-wrap"><div class="empty">Belum dimuatkan.</div></div>
 </section>
 
+
+<section id="unitSection" class="card" hidden>
+  <div class="head"><div><h2>🏫 Unit Kokurikulum</h2><small class="muted">V2.3 • UNIT + PENEMPATAN AHLI</small></div><button id="unitRefreshBtn" class="btn secondary">↻ Refresh</button></div>
+  <div id="unitSummary" class="unit-summary"></div>
+  <div id="unitAdminArea" hidden>
+    <div class="form-grid unit-form-grid">
+      <div><label>Nama Unit</label><input id="unitNama" placeholder="Contoh: Pengakap"></div>
+      <div><label>Kategori</label><select id="unitKategori"><option value="UNIT BERUNIFORM">Unit Beruniform</option><option value="KELAB / PERSATUAN">Kelab / Persatuan</option><option value="SUKAN / PERMAINAN">Sukan / Permainan</option><option value="RUMAH SUKAN">Rumah Sukan</option></select></div>
+      <div><label>Guru Penasihat</label><select id="unitGuru"><option value="">-- Pilih Guru --</option></select></div>
+      <div><label>Tahun</label><input id="unitTahun" type="number"></div>
+      <div><label>Status</label><select id="unitStatus"><option value="AKTIF">AKTIF</option><option value="TIDAK_AKTIF">TIDAK AKTIF</option></select></div>
+    </div>
+    <input id="unitOriginalId" type="hidden">
+    <button id="addUnitBtn" class="btn primary">+ Tambah Unit</button><button id="cancelUnitBtn" class="btn secondary" hidden>Batal Edit</button>
+    <div id="unitResult" class="result muted"></div>
+    <div class="unit-member-form">
+      <h3>Tambah Ahli ke Unit</h3>
+      <div class="form-grid unit-member-grid"><div><label>Unit</label><select id="memberUnit"><option value="">-- Pilih Unit --</option></select></div><div><label>Murid</label><select id="memberMurid"><option value="">-- Pilih Murid --</option></select></div><div><label>Tahun</label><input id="memberTahun" type="number"></div></div>
+      <button id="addMemberBtn" class="btn primary">+ Tambah Ahli</button><div id="memberResult" class="result muted"></div>
+    </div>
+  </div>
+  <div id="unitCards" class="unit-grid"></div>
+  <div id="unitTableWrap" class="table-wrap"></div>
+</section>
 <section id="guruSection" class="card" hidden>
   <div class="head"><div><h2>👨‍🏫 Pengurusan Guru</h2><small class="muted">ADMIN sahaja • TEST_GURU</small></div><button id="guruRefreshBtn" class="btn secondary">↻ Refresh</button></div>
   <div class="form-grid guru-form-grid">
