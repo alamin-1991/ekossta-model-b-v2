@@ -24,7 +24,7 @@
       <div class="nav-submenu">
         <button class="nav-item nav-subitem" data-page="unit" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span>Unit Kokurikulum</span></button>
         <button class="nav-item nav-subitem" data-page="attendance" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 3v4M18 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1z"/></svg><span>Kehadiran</span></button>
-        <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Aktiviti &amp; Acara</span><em>V2.5</em></button>
+        <button class="nav-item nav-subitem" data-page="activity" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Aktiviti &amp; Acara</span></button>
         <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M3 19a5 5 0 0 1 10 0M15 7h5M15 11h5M15 15h5"/></svg><span>Peserta Aktiviti</span></button>
         <button class="nav-item nav-subitem disabled" type="button"><svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.6-.8z"/></svg><span>Pencapaian</span><em>V2.6</em></button>
       </div>
@@ -178,6 +178,57 @@
     <div id="attendanceRecordsWrap" class="table-wrap"></div>
   </div>
 </section>
+
+<section id="activitySection" class="card page-section page-activity" hidden>
+  <div class="head"><div><h2>Aktiviti &amp; Acara</h2></div><button id="activityAddBtn" class="btn primary" type="button">+ Tambah Aktiviti</button></div>
+  <div class="activity-toolbar">
+    <input id="activitySearch" type="search" placeholder="Cari aktiviti atau tempat">
+    <select id="activityYear"><option value="">Semua Tahun</option></select>
+    <select id="activityLevel"><option value="">Semua Peringkat</option><option>SEKOLAH</option><option>ZON</option><option>DAERAH</option><option>NEGERI</option><option>KEBANGSAAN</option><option>ANTARABANGSA</option></select>
+    <button id="activityRefreshBtn" class="btn secondary" type="button">Refresh</button>
+  </div>
+  <div id="activityTableWrap" class="table-wrap"><div class="empty">Belum dimuatkan.</div></div>
+</section>
+<div id="activityModal" class="activity-modal" hidden>
+  <div class="activity-modal-backdrop" data-activity-close></div>
+  <section class="activity-dialog" role="dialog" aria-modal="true" aria-labelledby="activityModalTitle">
+    <div class="activity-dialog-head"><h3 id="activityModalTitle">Tambah Aktiviti</h3><button class="activity-close" type="button" data-activity-close>×</button></div>
+    <form id="activityForm">
+      <input id="activityId" type="hidden">
+      <div class="activity-form-grid">
+        <div class="activity-field activity-wide"><label>Nama Aktiviti</label><input id="activityName" required></div>
+        <div class="activity-field"><label>Tarikh</label><input id="activityDate" type="date" required></div>
+        <div class="activity-field"><label>Hari</label><input id="activityDay" readonly></div>
+        <div class="activity-field"><label>Masa</label><input id="activityTime" type="time"></div>
+        <div class="activity-field"><label>Tempat</label><input id="activityPlace" required></div>
+        <div class="activity-field"><label>Peringkat</label><select id="activityLevelForm" required><option value="">-- Pilih Peringkat --</option><option>SEKOLAH</option><option>ZON</option><option>DAERAH</option><option>NEGERI</option><option>KEBANGSAAN</option><option>ANTARABANGSA</option></select></div>
+        <div class="activity-field"><label>Guru</label><select id="activityTeacher" required><option value="">-- Pilih Guru --</option></select></div>
+      </div>
+      <div class="activity-dialog-actions"><button class="btn secondary" type="button" data-activity-close>Batal</button><button id="activitySaveBtn" class="btn primary" type="submit">Simpan Aktiviti</button></div>
+    </form>
+  </section>
+</div>
+
+<section id="activityParticipantsSection" class="card page-section page-activity-participants" hidden>
+  <div class="activity-participants-head">
+    <div>
+      <button id="activityParticipantsBackBtn" class="btn secondary" type="button">← Kembali ke Aktiviti</button>
+      <div class="activity-participants-kicker">KOKURIKULUM • AKTIVITI &amp; ACARA</div>
+      <h2 id="activityParticipantsTitle">Daftar Peserta</h2>
+      <div id="activityParticipantsMeta" class="activity-participants-meta"></div>
+    </div>
+    <button id="activityParticipantsSaveBtn" class="btn primary" type="button">Simpan Peserta</button>
+  </div>
+  <div class="activity-participants-panel">
+    <div class="activity-participants-filter">
+      <div><label>Kelas</label><select id="activityParticipantClass"><option value="">Semua Kelas</option></select></div>
+      <div><label>Carian Murid</label><input id="activityParticipantSearch" type="search" placeholder="Nama atau No. KP"></div>
+    </div>
+    <div id="activityParticipantsCount" class="activity-participants-count"></div>
+    <div id="activityParticipantsTableWrap" class="table-wrap"></div>
+  </div>
+</section>
+
 <section id="penempatanSection" class="card page-section page-penempatan" hidden>
   <div class="empty-state-large"><div class="empty-icon">👥</div><h2>Penempatan Unit</h2><p class="muted">Paparan penempatan akan dibina dalam patch modul seterusnya. Fungsi tambah ahli unit V2.3 tersedia melalui halaman <b>Unit Kokurikulum</b>.</p><button class="btn primary" type="button" data-page-jump="unit">Buka Unit Kokurikulum</button></div>
 </section>

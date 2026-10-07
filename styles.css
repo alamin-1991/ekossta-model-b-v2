@@ -664,3 +664,57 @@ html.dark-mode-active .attendance-kpi{background:var(--surface2)}
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }
+
+
+/* =========================================================
+   V2.5 AKTIVITI & ACARA
+========================================================= */
+.activity-toolbar{display:grid;grid-template-columns:minmax(220px,1.7fr) minmax(130px,.7fr) minmax(160px,.8fr) auto;gap:10px;margin:16px 0}
+.activity-toolbar input,.activity-toolbar select{min-height:42px}
+.activity-table{min-width:980px}
+.activity-table td,.activity-table th{vertical-align:middle}
+.activity-level-badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:var(--surface2);color:var(--primary);font-size:10px;font-weight:800;border:1px solid var(--border)}
+.activity-modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:18px}
+.activity-modal[hidden]{display:none}
+.activity-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(5px)}
+.activity-dialog{position:relative;width:min(900px,100%);max-height:min(90vh,820px);overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.28);padding:20px;transform:translateY(10px);opacity:0;transition:.16s ease}
+.activity-modal.show .activity-dialog{transform:none;opacity:1}
+.activity-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.activity-dialog-head h3{margin:0;font-size:19px}
+.activity-close{width:36px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-size:22px;cursor:pointer}
+.activity-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.activity-field{display:flex;flex-direction:column;gap:6px}
+.activity-field label{font-size:12px;font-weight:800}
+.activity-field input,.activity-field select,.activity-field textarea{width:100%}
+.activity-wide{grid-column:1/-1}
+.activity-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.activity-modal-open{overflow:hidden}
+@media(max-width:900px){.activity-toolbar{grid-template-columns:1fr 1fr}.activity-toolbar input{grid-column:1/-1}.activity-toolbar .btn{width:auto}.activity-form-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.activity-toolbar{grid-template-columns:1fr}.activity-toolbar input{grid-column:auto}.activity-toolbar .btn{width:100%}.activity-dialog{padding:16px;border-radius:18px}.activity-dialog-actions{flex-direction:column}.activity-dialog-actions .btn{width:100%}}
+
+/* V2.5 PATCH: Aktiviti & Acara + Daftar Peserta */
+.activity-table{min-width:860px}
+.activity-table td,.activity-table th{vertical-align:middle}
+.activity-day{display:block;margin-top:4px;color:var(--muted);font-size:11px}
+.activity-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.activity-participants-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+.activity-participants-head h2{margin:8px 0 6px;font-size:clamp(26px,3vw,38px)}
+.activity-participants-kicker{margin-top:16px;font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--primary)}
+.activity-participants-meta{font-size:14px;color:var(--muted)}
+.activity-participants-panel{border:1px solid var(--border);background:var(--surface2);border-radius:18px;padding:18px}
+.activity-participants-filter{display:grid;grid-template-columns:minmax(180px,.7fr) minmax(260px,1.3fr);gap:12px;margin-bottom:14px}
+.activity-participants-filter>div{display:flex;flex-direction:column;gap:6px}
+.activity-participants-count{font-size:13px;font-weight:800;color:var(--muted);margin:8px 0 12px}
+.activity-participant-table{min-width:900px}
+.activity-participant-table td,.activity-participant-table th{vertical-align:middle}
+.activity-participant-table input[type="checkbox"]{width:18px;height:18px;accent-color:var(--primary)}
+.activity-participant-role{min-width:130px}
+@media(max-width:900px){
+  .activity-participants-head{flex-direction:column}
+  .activity-participants-head .btn{width:100%}
+  .activity-participants-filter{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .activity-participants-filter{grid-template-columns:1fr}
+  .activity-participants-panel{padding:12px}
+}

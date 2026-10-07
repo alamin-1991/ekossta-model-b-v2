@@ -160,7 +160,7 @@ function buildMobileMenu_(preferredGroup=''){
       ['unit','Unit Kokurikulum',''],
       ['penempatan','Penempatan Unit',''],
       ['kehadiran','Kehadiran','V2.4'],
-      ['aktiviti','Aktiviti & Acara','V2.5'],
+      ['aktiviti','Aktiviti & Acara',''],
       ['peserta','Peserta Aktiviti',''],
       ['pencapaian','Pencapaian','V2.6']
     ]},
@@ -178,9 +178,9 @@ function buildMobileMenu_(preferredGroup=''){
 
   const allowed=page=>{
     if(['guru','users','system-settings'].includes(page))return canAdmin;
-    return ['unit','penempatan','murid','reports','attendance'].includes(page);
+    return ['unit','penempatan','murid','reports','attendance','activity','activity-participants'].includes(page);
   };
-  const isDisabled=page=>!allowed(page)||['aktiviti','peserta','pencapaian','galeri'].includes(page);
+  const isDisabled=page=>!allowed(page)||['peserta','pencapaian','galeri'].includes(page);
 
   const groupIsOpen=g=>{
     if(preferredGroup && g.key===preferredGroup)return true;
@@ -241,6 +241,8 @@ function showPage(page){
     users:'Pengurusan Pengguna',
     analysis:'Analisis',
     reports:'Laporan Aktiviti',
+    activity:'Aktiviti & Acara',
+    'activity-participants':'Daftar Peserta',
     'system-settings':'Tetapan Sistem',
     attendance:'Kehadiran'
   };
@@ -267,11 +269,10 @@ function showPage(page){
   if(page==='guru')loadGuru();
   if(page==='unit')loadUnit();
   if(page==='attendance')loadAttendancePage();
+  if(page==='activity')loadAktivitiPage();
+  if(page==='activity-participants')loadAktivitiPesertaPage();
   if(page==='unit-overview')loadUnitOverview();
   if(page==='users')loadUsers();
-
-  // Selepas memilih submenu, tutup popup/dropdown supaya navigasi tidak kekal terbuka.
-  if(isDesktopSidebar_()) closeSidebarPopups_();
 
   // Pastikan submenu induk terbuka hanya pada desktop dropdown.
   // Tablet menggunakan popup dan perlu ditutup selepas pilihan dibuat.
@@ -309,6 +310,18 @@ function init(){
   bind('cancelUnitBtn','click',cancelUnit);
   bind('addMemberBtn','click',addUnitMember);
   bind('attendanceRefreshBtn','click',loadAttendancePage);
+  bind('activityAddBtn','click',()=>openAktivitiModal());
+  bind('activityRefreshBtn','click',loadAktivitiPage);
+  bind('activitySearch','input',filterAktivitiTable);
+  bind('activityYear','change',filterAktivitiTable);
+  bind('activityLevel','change',filterAktivitiTable);
+  bind('activityDate','change',updateActivityDay_);
+  bind('activityForm','submit',saveAktiviti);
+  bind('activityParticipantsBackBtn','click',()=>showPage('activity'));
+  bind('activityParticipantsSaveBtn','click',saveAktivitiPeserta);
+  bind('activityParticipantClass','change',renderAktivitiPesertaTable_);
+  bind('activityParticipantSearch','input',renderAktivitiPesertaTable_);
+  document.querySelectorAll('[data-activity-close]').forEach(e=>e.addEventListener('click',closeAktivitiModal));
   bind('attLoadBtn','click',loadAttendanceForm);
   bind('attSaveBtn','click',saveAttendance);
   bind('attRecordRefreshBtn','click',loadAttendanceRecords);
@@ -497,12 +510,12 @@ async function loadUnitForms(){
   const y=new Date().getFullYear();if(!$('unitTahun').value)$('unitTahun').value=y;if(!$('memberTahun').value)$('memberTahun').value=y;
 }
 function renderUnit(rows){
-  const cards=$('unitCards'),wrap=$('unitTableWrap');
-  if(!rows.length){cards.innerHTML='';$('unitSummary').innerHTML='';wrap.innerHTML='<div class="empty">Tiada unit direkodkan.</div>';return}
+  const cards=$('unitCards');
+  if(!rows.length){cards.innerHTML='';$('unitSummary').innerHTML='';return}
   const totals=rows.reduce((a,r)=>({unit:a.unit+1,ahli:a.ahli+Number(r.JUMLAH_AHLI||0),lelaki:a.lelaki+Number(r.LELAKI||0),perempuan:a.perempuan+Number(r.PEREMPUAN||0)}),{unit:0,ahli:0,lelaki:0,perempuan:0});$('unitSummary').innerHTML=`<div><b>${totals.unit}</b><small>Unit</small></div><div><b>${totals.ahli}</b><small>Jumlah ahli</small></div><div><b>${totals.lelaki}</b><small>Lelaki</small></div><div><b>${totals.perempuan}</b><small>Perempuan</small></div>`;
   cards.innerHTML=rows.map(r=>`<div class="unit-card unit-card-clickable" role="button" tabindex="0" onclick="openUnitOverview('${escAttr(r.UNIT_ID)}','${escAttr(r.TAHUN)}')" onkeydown="if(event.key==='Enter'||event.key===' ')openUnitOverview('${escAttr(r.UNIT_ID)}','${escAttr(r.TAHUN)}')"><div class="unit-card-top"><span class="unit-category">${esc(r.KATEGORI)}</span><span class="unit-status ${String(r.STATUS)==='AKTIF'?'on':'off'}">${esc(r.STATUS)}</span></div><h3>${esc(r.NAMA_UNIT)}</h3><div class="unit-counts"><div><b>${Number(r.JUMLAH_AHLI||0)}</b><small>Jumlah</small></div><div><b>${Number(r.LELAKI||0)}</b><small>Lelaki</small></div><div><b>${Number(r.PEREMPUAN||0)}</b><small>Perempuan</small></div></div><div class="unit-card-open">Buka Butiran Unit →</div></div>`).join('');
-  const t=document.createElement('table'),thead=document.createElement('thead'),hr=document.createElement('tr');['UNIT','KATEGORI','TAHUN','JUMLAH','LELAKI','PEREMPUAN','STATUS'].forEach(c=>{const th=document.createElement('th');th.textContent=c;hr.appendChild(th)});thead.appendChild(hr);t.appendChild(thead);const tb=document.createElement('tbody');rows.forEach(r=>{const tr=document.createElement('tr');[r.NAMA_UNIT,r.KATEGORI,r.TAHUN,r.JUMLAH_AHLI||0,r.LELAKI||0,r.PEREMPUAN||0,r.STATUS].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});tb.appendChild(tr)});t.appendChild(tb);wrap.replaceChildren(t);
 }
+
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}function escAttr(v){return esc(v).replace(/`/g,'&#96;')}
 function editUnit(id){const r=UNIT_ROWS.find(x=>String(x.UNIT_ID)===String(id));if(!r)return;$('unitOriginalId').value=r.UNIT_ID;$('unitNama').value=r.NAMA_UNIT||'';$('unitKategori').value=r.KATEGORI||'UNIT BERUNIFORM';$('unitGuru').value=r.GURU_PENASIHAT||'';$('unitTahun').value=r.TAHUN||'';$('unitStatus').value=r.STATUS||'AKTIF';$('addUnitBtn').textContent='Simpan Perubahan';$('cancelUnitBtn').hidden=false;window.scrollTo({top:$('unitSection').offsetTop-20,behavior:'smooth'})}
 function cancelUnit(){['unitOriginalId','unitNama'].forEach(id=>$(id).value='');$('unitGuru').value='';$('unitStatus').value='AKTIF';$('unitTahun').value=new Date().getFullYear();$('addUnitBtn').textContent='+ Tambah Unit';$('cancelUnitBtn').hidden=true}
@@ -577,6 +590,87 @@ function toggleTheme(){
 function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),3200)}
 
 
+
+/* =========================================================
+   V2.5 AKTIVITI & ACARA FRONTEND
+========================================================= */
+let AKTIVITI_ROWS=[];
+function activityEsc_(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function activityDate_(v){const d=new Date(v);return isNaN(d.getTime())?'':d.toLocaleDateString('ms-MY')}
+function activityDayFromDate_(v){if(!v)return '';const d=new Date(String(v)+'T00:00:00');if(isNaN(d.getTime()))return '';return ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'][d.getDay()]}
+async function loadAktivitiPage(){
+  try{
+    const d=await apiGet('getAktiviti',{token:state.token});
+    AKTIVITI_ROWS=d.data||[];
+    fillAktivitiYears_();
+    renderAktivitiTable_(AKTIVITI_ROWS);
+  }catch(e){toast(e.message||'Gagal memuatkan aktiviti.');}
+}
+function fillAktivitiYears_(){
+  const sel=$('activityYear');if(!sel)return;
+  const current=sel.value;
+  const years=[...new Set(AKTIVITI_ROWS.map(r=>String(r.TARIKH||'').slice(0,4)).filter(x=>/^\d{4}$/.test(x)))].sort((a,b)=>b-a);
+  sel.innerHTML='<option value="">Semua Tahun</option>'+years.map(y=>`<option value="${activityEsc_(y)}">${activityEsc_(y)}</option>`).join('');
+  if(current)sel.value=current;
+}
+function filterAktivitiTable(){
+  const q=String($('activitySearch')?.value||'').trim().toLowerCase();
+  const y=String($('activityYear')?.value||'');
+  const level=String($('activityLevel')?.value||'').toUpperCase();
+  const rows=AKTIVITI_ROWS.filter(r=>{
+    const hay=[r.NAMA_AKTIVITI,r.TEMPAT,r.OBJEKTIF,r.AKTIVITI,r.IMPAK].join(' ').toLowerCase();
+    return (!q||hay.includes(q))&&(!y||String(r.TARIKH||'').slice(0,4)===y)&&(!level||String(r.PERINGKAT||'').toUpperCase()===level);
+  });
+  renderAktivitiTable_(rows);
+}
+function renderAktivitiTable_(rows){
+  const wrap=$('activityTableWrap');if(!wrap)return;
+  if(!rows.length){wrap.innerHTML='<div class="empty">Tiada aktiviti ditemui.</div>';return;}
+  wrap.innerHTML=`<table class="activity-table"><thead><tr><th>AKTIVITI</th><th>TARIKH</th><th>TEMPAT</th><th>PERINGKAT</th><th>GURU</th><th>TINDAKAN</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${activityEsc_(r.NAMA_AKTIVITI)}</b></td><td>${activityDate_(r.TARIKH)||'-'}${r.HARI?`<small class="activity-day">${activityEsc_(r.HARI)}</small>`:''}</td><td>${activityEsc_(r.TEMPAT||'-')}</td><td><span class="activity-level-badge">${activityEsc_(r.PERINGKAT||'-')}</span></td><td>${activityEsc_(r.NO_GURU||'-')}</td><td><div class="activity-actions"><button class="btn secondary small" type="button" onclick="openAktivitiPeserta('${activityEsc_(r.AKTIVITI_ID)}')">Peserta</button><button class="btn secondary small" type="button" onclick="openAktivitiModal('${activityEsc_(r.AKTIVITI_ID)}')">Edit</button></div></td></tr>`).join('')}</tbody></table>`;
+}
+async function loadActivityTeacherOptions_(selected=''){
+  const sel=$('activityTeacher');if(!sel)return;
+  try{
+    const d=await apiGet('getGuru',{token:state.token});
+    const teachers=(d.data||[]).filter(x=>String(x.STATUS||'AKTIF').toUpperCase()==='AKTIF');
+    sel.innerHTML='<option value="">-- Pilih Guru --</option>'+teachers.map(x=>`<option value="${activityEsc_(x.NO_GURU)}">${activityEsc_(x.NAMA)} — ${activityEsc_(x.NO_GURU)}</option>`).join('');
+    if(selected)sel.value=selected;
+    if(state.user?.role==='GURU'){
+      const me=teachers.find(x=>String(x.USER_ID||'')===String(state.user?.userId||''));
+      if(me)sel.value=me.NO_GURU;
+      sel.disabled=true;
+    }else sel.disabled=false;
+  }catch(e){toast(e.message||'Gagal memuatkan guru.');}
+}
+function updateActivityDay_(){if($('activityDay'))$('activityDay').value=activityDayFromDate_($('activityDate')?.value||'')}
+async function openAktivitiModal(id=''){
+  const modal=$('activityModal');if(!modal)return;
+  $('activityForm').reset();$('activityId').value=id||'';$('activityModalTitle').textContent=id?'Kemaskini Aktiviti':'Tambah Aktiviti';
+  $('activityDay').value='';
+  const r=AKTIVITI_ROWS.find(x=>String(x.AKTIVITI_ID)===String(id));
+  await loadActivityTeacherOptions_(r?.NO_GURU||'');
+  if(r){
+    $('activityName').value=r.NAMA_AKTIVITI||'';
+    $('activityDate').value=String(r.TARIKH||'').slice(0,10);
+    $('activityDay').value=r.HARI||activityDayFromDate_(r.TARIKH);
+    $('activityTime').value=r.MASA||'';
+    $('activityPlace').value=r.TEMPAT||'';
+    $('activityLevelForm').value=r.PERINGKAT||'';
+  }
+  modal.hidden=false;document.body.classList.add('activity-modal-open');requestAnimationFrame(()=>modal.classList.add('show'));
+}
+function closeAktivitiModal(){const modal=$('activityModal');if(!modal)return;modal.classList.remove('show');document.body.classList.remove('activity-modal-open');setTimeout(()=>{modal.hidden=true},160)}
+async function saveAktiviti(e){
+  e.preventDefault();
+  const b=$('activitySaveBtn');
+  const p={token:state.token,aktivitiId:$('activityId').value.trim(),namaAktiviti:$('activityName').value.trim(),tarikh:$('activityDate').value,masa:$('activityTime').value,tempat:$('activityPlace').value.trim(),peringkat:$('activityLevelForm').value,noGuru:$('activityTeacher').value};
+  if(!p.namaAktiviti||!p.tarikh||!p.tempat||!p.peringkat)return toast('Lengkapkan maklumat asas aktiviti.');
+  b.disabled=true;b.textContent='Menyimpan...';
+  try{const d=await apiGet('saveAktiviti',p);toast(d.message||'Aktiviti berjaya disimpan.');closeAktivitiModal();await loadAktivitiPage();}
+  catch(e){toast(e.message||'Gagal menyimpan aktiviti.');}
+  finally{b.disabled=false;b.textContent='Simpan Aktiviti';}
+}
+
 /* =========================================================
    V2.4 UNIT OVERVIEW
 ========================================================= */
@@ -604,7 +698,7 @@ async function loadUnitOverview(){
     const d=await apiGet('getUnitOverview',{token:state.token,unitId:UNIT_OVERVIEW_ID,tahun:UNIT_OVERVIEW_YEAR});
     const u=d.unit||{};
     if(title)title.textContent=u.NAMA_UNIT||'Unit Kokurikulum';
-    if($('unitOverviewMeta'))$('unitOverviewMeta').textContent='';
+    if($('unitOverviewMeta'))$('unitOverviewMeta').textContent=u.GURU_PENASIHAT?`Guru Penasihat: ${esc(u.GURU_PENASIHAT)}`:'';
     const st=d.stats||{};
     $('unitOverviewStats').innerHTML=`<div><b>${st.jumlahAhli||0}</b><small>Jumlah Ahli</small></div><div><b>${st.jumlahAJK||0}</b><small>AJK</small></div><div><b>${st.jumlahMingguDirekodkan||0}</b><small>Minggu Direkodkan</small></div><div><b>${(d.minggu||[]).filter(x=>x.ADA_REKOD).length?Math.round((d.minggu||[]).filter(x=>x.ADA_REKOD).reduce((a,x)=>a+x.PERATUS,0)/(d.minggu||[]).filter(x=>x.ADA_REKOD).length):0}%</b><small>Purata Kehadiran</small></div>`;
     renderUnitOverviewMembers_(d.ahli||[]);
@@ -701,3 +795,32 @@ document.addEventListener('click',e=>{
   if(e.target && e.target.id==='unitOverviewRefreshBtn')loadUnitOverview();
 });
 document.addEventListener('DOMContentLoaded',init);
+
+
+let AKTIVITI_PESERTA_STATE={aktiviti:null,rows:[],classes:[]};
+async function openAktivitiPeserta(id){state.currentActivityId=String(id||'');showPage('activity-participants');}
+async function loadAktivitiPesertaPage(){
+  const id=String(state.currentActivityId||'');if(!id){showPage('activity');return;}
+  try{
+    const d=await apiGet('getAktivitiPeserta',{token:state.token,aktivitiId:id});
+    AKTIVITI_PESERTA_STATE={aktiviti:d.aktiviti||null,rows:d.data||[],classes:d.classes||[]};
+    const a=AKTIVITI_PESERTA_STATE.aktiviti||{};
+    if($('activityParticipantsTitle'))$('activityParticipantsTitle').textContent=a.NAMA_AKTIVITI||'Daftar Peserta';
+    if($('activityParticipantsMeta'))$('activityParticipantsMeta').textContent=[activityDate_(a.TARIKH),a.TEMPAT,a.PERINGKAT].filter(Boolean).join(' • ');
+    const sel=$('activityParticipantClass');if(sel){sel.innerHTML='<option value="">Semua Kelas</option>'+AKTIVITI_PESERTA_STATE.classes.map(x=>`<option value="${activityEsc_(x)}">${activityEsc_(x)}</option>`).join('');}
+    if($('activityParticipantSearch'))$('activityParticipantSearch').value='';renderAktivitiPesertaTable_();
+  }catch(e){toast(e.message||'Gagal memuatkan peserta.');showPage('activity');}
+}
+function renderAktivitiPesertaTable_(){
+  const wrap=$('activityParticipantsTableWrap');if(!wrap)return;
+  const cls=String($('activityParticipantClass')?.value||'');const q=String($('activityParticipantSearch')?.value||'').trim().toLowerCase();
+  const rows=AKTIVITI_PESERTA_STATE.rows.filter(r=>(!cls||String(r.KELAS)===cls)&&(!q||String(r.NAMA).toLowerCase().includes(q)||String(r.NO_KP).toLowerCase().includes(q)));
+  const selected=AKTIVITI_PESERTA_STATE.rows.filter(r=>r.selected).length;if($('activityParticipantsCount'))$('activityParticipantsCount').textContent=`${selected} peserta dipilih`;
+  wrap.innerHTML=`<table class="activity-participant-table"><thead><tr><th>PILIH</th><th>NAMA MURID</th><th>NO. KP</th><th>TINGKATAN</th><th>KELAS</th><th>JANTINA</th><th>PERANAN</th></tr></thead><tbody>${rows.length?rows.map(r=>`<tr><td><input class="activity-participant-check" type="checkbox" data-kp="${activityEsc_(r.NO_KP)}" ${r.selected?'checked':''}></td><td><b>${activityEsc_(r.NAMA)}</b></td><td>${activityEsc_(r.NO_KP)}</td><td>${activityEsc_(r.TINGKATAN||'-')}</td><td>${activityEsc_(r.KELAS||'-')}</td><td>${activityEsc_(r.JANTINA||'-')}</td><td><input class="activity-participant-role" data-kp="${activityEsc_(r.NO_KP)}" value="${activityEsc_(r.peranan||'PESERTA')}" ${r.selected?'':'disabled'}></td></tr>`).join(''):'<tr><td colspan="7"><div class="empty">Tiada murid ditemui.</div></td></tr>'}</tbody></table>`;
+  wrap.querySelectorAll('.activity-participant-check').forEach(ch=>ch.addEventListener('change',e=>{const r=AKTIVITI_PESERTA_STATE.rows.find(x=>String(x.NO_KP)===String(e.target.dataset.kp));if(!r)return;r.selected=e.target.checked;renderAktivitiPesertaTable_();}));
+  wrap.querySelectorAll('.activity-participant-role').forEach(inp=>inp.addEventListener('input',e=>{const r=AKTIVITI_PESERTA_STATE.rows.find(x=>String(x.NO_KP)===String(e.target.dataset.kp));if(r)r.peranan=e.target.value;}));
+}
+async function saveAktivitiPeserta(){
+  const id=String(state.currentActivityId||'');if(!id)return;const selected=AKTIVITI_PESERTA_STATE.rows.filter(r=>r.selected).map(r=>({NO_KP:r.NO_KP,PERANAN:r.peranan||'PESERTA'}));const b=$('activityParticipantsSaveBtn');if(b){b.disabled=true;b.textContent='Menyimpan...';}
+  try{const d=await apiGet('saveAktivitiPeserta',{token:state.token,aktivitiId:id,peserta:JSON.stringify(selected)});toast(d.message||'Peserta berjaya disimpan.');await loadAktivitiPesertaPage();}catch(e){toast(e.message||'Gagal menyimpan peserta.');}finally{if(b){b.disabled=false;b.textContent='Simpan Peserta';}}
+}

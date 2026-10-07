@@ -1,4 +1,4 @@
-const CACHE = 'ekossta-model-b-v2-3-ui-20261006-mobilefix';
+const CACHE = 'ekossta-model-b-v2-5-activity-20261007';
 const SHELL = [
   './',
   './index.html',
