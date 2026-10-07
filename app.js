@@ -623,49 +623,54 @@ function filterAktivitiTable(){
   });
   renderAktivitiTable_(rows);
 }
-function renderAktivitiTable_(rows){
-  const wrap=$('activityTableWrap');if(!wrap)return;
-  if(!rows.length){wrap.innerHTML='<div class="empty">Tiada aktiviti ditemui.</div>';return;}
-  wrap.innerHTML=`<table class="activity-table"><thead><tr><th>AKTIVITI</th><th>TARIKH</th><th>TEMPAT</th><th>PERINGKAT</th><th>GURU</th><th>TINDAKAN</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${activityEsc_(r.NAMA_AKTIVITI)}</b></td><td>${activityDate_(r.TARIKH)||'-'}${r.HARI?`<small class="activity-day">${activityEsc_(r.HARI)}</small>`:''}</td><td>${activityEsc_(r.TEMPAT||'-')}</td><td><span class="activity-level-badge">${activityEsc_(r.PERINGKAT||'-')}</span></td><td>${activityEsc_(r.NO_GURU||'-')}</td><td><div class="activity-actions"><button class="btn secondary small" type="button" onclick="openAktivitiPeserta('${activityEsc_(r.AKTIVITI_ID)}')">Peserta</button><button class="btn secondary small" type="button" onclick="openAktivitiPermissionLetter('${activityEsc_(r.AKTIVITI_ID)}')">Jana Surat</button><button class="btn secondary small" type="button" onclick="openAktivitiModal('${activityEsc_(r.AKTIVITI_ID)}')">Edit</button></div></td></tr>`).join('')}</tbody></table>`;
+function suratTplEsc_(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function suratTplReplace_(html,a,p,d){
+  const map={NAMA_SEKOLAH:d.schoolName||'',NAMA_MURID:p?.NAMA||'',NO_KP:p?.NO_KP||'',KELAS:p?.KELAS||'',NAMA_AKTIVITI:a?.NAMA_AKTIVITI||'',ANJURAN:a?.NO_GURU||'',TARIKH:activityDate_(a?.TARIKH)||'',PERINGKAT:a?.PERINGKAT||'',TEMPAT:a?.TEMPAT||'',HARI:a?.HARI||'',MASA:a?.MASA||''};
+  let out=String(html||'');Object.keys(map).forEach(k=>out=out.replace(new RegExp('{{\\s*'+k+'\\s*}}','g'),suratTplEsc_(map[k])));
+  if(d.logoDataUrl)out=out.replace(/\{\{LOGO_SEKOLAH\}\}/g,`<img src="${d.logoDataUrl}" style="max-width:72px;max-height:78px;object-fit:contain;display:block;margin:0 auto 8px">`);else out=out.replace(/\{\{LOGO_SEKOLAH\}\}/g,'');
+  return out;
 }
-
+function suratTplInjectCss_(){
+  if(document.getElementById('suratTplEditorCss'))return;
+  const st=document.createElement('style');st.id='suratTplEditorCss';st.textContent=`
+  .st-modal{position:fixed;inset:0;z-index:99999;background:rgba(8,9,15,.72);backdrop-filter:blur(5px);display:none;align-items:stretch;justify-content:center;padding:18px}.st-modal.open{display:flex}.st-dialog{width:min(1400px,100%);height:100%;background:var(--surface,#1b1b24);border:1px solid var(--border,#3b3b4a);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.4)}.st-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border,#3b3b4a)}.st-title{font-size:18px;font-weight:800}.st-sub{font-size:12px;opacity:.7;margin-top:3px}.st-actions{display:flex;gap:8px;flex-wrap:wrap}.st-body{display:grid;grid-template-columns:minmax(0,1fr) 430px;min-height:0;flex:1}.st-editor{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border,#3b3b4a)}.st-toolbar{display:flex;gap:5px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border,#3b3b4a);background:var(--surface-2,#22222d)}.st-tool{min-width:34px;height:32px;border:1px solid var(--border,#454555);border-radius:7px;background:transparent;color:inherit;cursor:pointer;font-weight:700}.st-tool:hover{background:rgba(109,40,217,.16)}.st-select{height:32px;border:1px solid var(--border,#454555);border-radius:7px;background:var(--surface,#1b1b24);color:inherit;padding:0 8px}.st-vars{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px;border-bottom:1px solid var(--border,#3b3b4a);font-size:12px}.st-var{border:1px solid var(--border,#454555);border-radius:999px;background:transparent;color:inherit;padding:5px 9px;cursor:pointer}.st-canvas{flex:1;overflow:auto;padding:24px;background:#2a2a33}.st-page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#111;padding:18mm;box-shadow:0 5px 25px rgba(0,0,0,.28);outline:none}.st-page:focus{box-shadow:0 0 0 2px #6d28d9,0 5px 25px rgba(0,0,0,.28)}.st-preview{overflow:auto;background:#e9e9ed;padding:22px}.st-preview-page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#111;padding:18mm;box-shadow:0 5px 20px rgba(0,0,0,.18);font-family:Arial,sans-serif;font-size:11pt;line-height:1.45}.st-note{padding:8px 12px;font-size:12px;opacity:.72;border-top:1px solid var(--border,#3b3b4a)}@media(max-width:1000px){.st-body{grid-template-columns:1fr}.st-preview{display:none}.st-editor{border-right:0}.st-page{width:100%;min-height:0}}`;
+  document.head.appendChild(st);
+}
+let ST_DATA=null;
+function stOpenTemplateEditor(activityId){
+  if(String(state.user?.role||'').toUpperCase()!=='ADMIN')return toast('Hanya ADMIN boleh mengedit template surat.');
+  suratTplInjectCss_();
+  let m=document.getElementById('stTemplateModal');
+  if(!m){m=document.createElement('div');m.id='stTemplateModal';m.className='st-modal';m.innerHTML=`<div class="st-dialog"><div class="st-head"><div><div class="st-title">Edit Template Surat Kebenaran</div><div class="st-sub">Editor seperti Word • Template digunakan untuk semua surat kebenaran</div></div><div class="st-actions"><button class="btn secondary" type="button" id="stReset">Pulihkan Template</button><button class="btn primary" type="button" id="stSave">Simpan Template</button><button class="btn secondary" type="button" id="stClose">Tutup</button></div></div><div class="st-body"><div class="st-editor"><div class="st-toolbar"><button class="st-tool" data-cmd="undo">↶</button><button class="st-tool" data-cmd="redo">↷</button><button class="st-tool" data-cmd="bold"><b>B</b></button><button class="st-tool" data-cmd="italic"><i>I</i></button><button class="st-tool" data-cmd="underline"><u>U</u></button><button class="st-tool" data-cmd="justifyLeft">L</button><button class="st-tool" data-cmd="justifyCenter">C</button><button class="st-tool" data-cmd="justifyRight">R</button><button class="st-tool" data-cmd="insertUnorderedList">• List</button><button class="st-tool" data-cmd="insertOrderedList">1. List</button><select class="st-select" id="stFont"><option value="Arial">Arial</option><option value="Calibri">Calibri</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times New Roman</option><option value="Verdana">Verdana</option></select><select class="st-select" id="stSize"><option value="2">10</option><option value="3" selected>12</option><option value="4">14</option><option value="5">18</option><option value="6">24</option></select></div><div class="st-vars"><span>Medan automatik:</span><button class="st-var" data-var="{{NAMA_MURID}}">Nama Murid</button><button class="st-var" data-var="{{NO_KP}}">No. KP</button><button class="st-var" data-var="{{KELAS}}">Kelas</button><button class="st-var" data-var="{{NAMA_AKTIVITI}}">Aktiviti</button><button class="st-var" data-var="{{TARIKH}}">Tarikh</button><button class="st-var" data-var="{{PERINGKAT}}">Peringkat</button><button class="st-var" data-var="{{TEMPAT}}">Tempat</button><button class="st-var" data-var="{{ANJURAN}}">Anjuran</button><button class="st-var" data-var="{{NAMA_SEKOLAH}}">Sekolah</button><button class="st-var" data-var="{{LOGO_SEKOLAH}}">Logo</button></div><div class="st-canvas"><div id="stEditor" class="st-page" contenteditable="true"></div></div><div class="st-note">Tip: pilih teks dan gunakan toolbar seperti Word. Medan dalam {{...}} akan diganti secara automatik semasa surat dijana.</div></div><div class="st-preview"><div id="stPreview" class="st-preview-page"></div></div></div></div>`;document.body.appendChild(m);}
+  m.classList.add('open');
+  const ed=document.getElementById('stEditor');
+  const load=async()=>{try{const d=await apiGet('getPermissionLetterTemplate',{token:state.token});const a=await apiGet('getAktivitiPeserta',{token:state.token,aktivitiId:activityId});ST_DATA=Object.assign({},d,{activity:a.aktiviti||{},peserta:(a.data||[]).filter(x=>x.selected)});ed.innerHTML=d.html||'';stPreviewTemplate_();}catch(e){toast(e.message||'Gagal memuatkan template.');}};load();
+  m.querySelectorAll('.st-tool').forEach(b=>{b.onclick=()=>{ed.focus();document.execCommand(b.dataset.cmd,false,null);stPreviewTemplate_();}});
+  document.getElementById('stFont').onchange=e=>{ed.focus();document.execCommand('fontName',false,e.target.value);stPreviewTemplate_();};
+  document.getElementById('stSize').onchange=e=>{ed.focus();document.execCommand('fontSize',false,e.target.value);stPreviewTemplate_();};
+  m.querySelectorAll('.st-var').forEach(b=>b.onclick=()=>{ed.focus();document.execCommand('insertText',false,b.dataset.var);stPreviewTemplate_();});
+  ed.oninput=stPreviewTemplate_;
+  document.getElementById('stClose').onclick=()=>m.classList.remove('open');
+  document.getElementById('stSave').onclick=async()=>{try{const d=await apiGet('savePermissionLetterTemplate',{token:state.token,html:ed.innerHTML});toast(d.message||'Template berjaya disimpan.');m.classList.remove('open');}catch(e){toast(e.message||'Gagal menyimpan template.');}};
+  document.getElementById('stReset').onclick=async()=>{if(!confirm('Pulihkan template surat asal? Perubahan semasa akan diganti.'))return;try{const d=await apiGet('resetPermissionLetterTemplate',{token:state.token});ed.innerHTML=d.html||'';stPreviewTemplate_();toast(d.message||'Template dipulihkan.');}catch(e){toast(e.message||'Gagal memulihkan template.');}};
+}
+function stPreviewTemplate_(){const ed=document.getElementById('stEditor'),pv=document.getElementById('stPreview');if(!ed||!pv)return;const a=ST_DATA?.activity||{},p=(ST_DATA?.peserta||[])[0]||{};pv.innerHTML=suratTplReplace_(ed.innerHTML,a,p,ST_DATA||{});}
+function renderAktivitiTable_(rows){
+  const wrap=$('activityTableWrap');if(!wrap)return;if(!rows.length){wrap.innerHTML='<div class="empty">Tiada aktiviti ditemui.</div>';return;}
+  const admin=String(state.user?.role||'').toUpperCase()==='ADMIN';
+  wrap.innerHTML=`<table class="activity-table"><thead><tr><th>AKTIVITI</th><th>TARIKH</th><th>TEMPAT</th><th>PERINGKAT</th><th>GURU</th><th>TINDAKAN</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${activityEsc_(r.NAMA_AKTIVITI)}</b></td><td>${activityDate_(r.TARIKH)||'-'}${r.HARI?`<small class="activity-day">${activityEsc_(r.HARI)}</small>`:''}</td><td>${activityEsc_(r.TEMPAT||'-')}</td><td><span class="activity-level-badge">${activityEsc_(r.PERINGKAT||'-')}</span></td><td>${activityEsc_(r.NO_GURU||'-')}</td><td><div class="activity-actions"><button class="btn secondary small" type="button" onclick="openAktivitiPeserta('${activityEsc_(r.AKTIVITI_ID)}')">Peserta</button><button class="btn secondary small" type="button" onclick="openAktivitiPermissionLetter('${activityEsc_(r.AKTIVITI_ID)}')">Jana Surat</button>${admin?`<button class="btn secondary small" type="button" onclick="stOpenTemplateEditor('${activityEsc_(r.AKTIVITI_ID)}')">Edit Template</button>`:''}<button class="btn secondary small" type="button" onclick="openAktivitiModal('${activityEsc_(r.AKTIVITI_ID)}')">Edit</button></div></td></tr>`).join('')}</tbody></table>`;
+}
 async function openAktivitiPermissionLetter(activityId){
   try{
     if(!activityId)return toast('ID aktiviti tidak sah.');
     const d=await apiGet('getAktivitiPeserta',{token:state.token,aktivitiId:activityId});
     const peserta=(d.data||[]).filter(x=>x.selected&&String(x.STATUS||'AKTIF').toUpperCase()==='AKTIF');
     if(!peserta.length){toast('Tiada peserta berdaftar. Daftarkan peserta terlebih dahulu.');return;}
-    const a=d.aktiviti||{};
-    const nama=String(a.NAMA_AKTIVITI||'Aktiviti').trim();
-    if(!window.confirm(`JANA SURAT KEBENARAN\n\nAktiviti: ${nama}\nJumlah peserta: ${peserta.length}\n\nSatu surat akan dijana untuk setiap peserta. Selepas itu pilih Print atau Save as PDF.\n\nTeruskan?`))return;
-    const w=window.open('','_blank');
-    if(!w){toast('Popup disekat. Benarkan pop-up untuk e-KOSSTA.');return;}
-    const schoolName='SMK TENGKU TEMENGGONG AHMAD';
-    const date=activityDate_(a.TARIKH)||'-';
-    const safe=v=>activityEsc_(v||'-');
-    const pages=peserta.map((p,i)=>`<section class="permission-page">
-      <div class="letter-header">
-        <div class="school-name">${safe(schoolName)}</div>
-        <div class="school-sub">SURAT AKUAN KEBENARAN WARIS MENYERTAI AKTIVITI KOKURIKULUM</div>
-      </div>
-      <p>Saya <span class="line"></span> No. Kad Pengenalan: <span class="line short"></span></p>
-      <p>Beralamat di <span class="line long"></span></p>
-      <p>No. Telefon: <span class="line short"></span></p>
-      <p>mengaku adalah waris kepada murid bernama di bawah:</p>
-      <table class="letter-table"><tr><th>Nama Murid</th><td>${safe(p.NAMA)}</td></tr><tr><th>No. Kad Pengenalan</th><td>${safe(p.NO_KP)}</td></tr><tr><th>Kelas</th><td>${safe(p.KELAS)}</td></tr><tr><th>Sekolah</th><td>${safe(schoolName)}</td></tr></table>
-      <p>Saya dengan ini memberi kebenaran bertulis saya kepada anak / jagaan saya untuk menyertai:</p>
-      <table class="letter-table"><tr><th>Program</th><td>${safe(a.NAMA_AKTIVITI)}</td></tr><tr><th>Tarikh</th><td>${safe(date)}</td></tr><tr><th>Masa</th><td>${safe(a.MASA)}</td></tr><tr><th>Peringkat</th><td>${safe(a.PERINGKAT)}</td></tr><tr><th>Tempat</th><td>${safe(a.TEMPAT)}</td></tr></table>
-      <p>2. Saya difahamkan bahawa soal keselamatan dan disiplin sentiasa diberi perhatian sewajarnya oleh Guru / Pegawai / Urusetia yang telah diamanahkan. Sekiranya kesihatan anak / jagaan saya terganggu dalam masa latihan, program atau perjalanan, maka saya dengan sepenuh hati membenarkan Guru / Pegawai / Urusetia menguruskan bagi pihak saya untuk mendapatkan rawatan perubatan.</p>
-      <p>3. Saya dengan ini mengakui bahawa pelajar di atas <b>ADA / TIDAK ADA*</b> mengidap penyakit kronik / berjangkit. Nyatakan (jika ada): <span class="line long"></span></p>
-      <div class="signature-grid"><div>Tarikh: <span class="line short"></span><br><br>Tandatangan Ibu Bapa / Penjaga / Waris<br><br>____________________________</div><div>Tarikh: <span class="line short"></span><br><br>Nama Saksi: <span class="line"></span><br><br>Tandatangan Saksi<br><br>____________________________</div></div>
-      <div class="approval">Disahkan oleh Pengetua / Guru Besar / Cop rasmi:<br><br>____________________________________________</div>
-      <div class="page-no">Surat ${i+1} daripada ${peserta.length}</div>
-    </section>`).join('');
-    w.document.open();
-    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Surat Kebenaran - ${safe(nama)}</title><style>
-      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}.letter-table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px}.letter-table th,.letter-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}.letter-table th{width:28%;font-weight:700}.line{display:inline-block;min-width:180px;border-bottom:1px solid #555;height:14px}.line.short{min-width:120px}.line.long{display:block;width:100%;margin-top:4px}.signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:25px;font-size:11px;line-height:1.5}.approval{margin-top:25px;font-size:11px}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
-    </style></head><body>${pages}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));</script></body></html>`);
-    w.document.close();w.focus();
+    const a=d.aktiviti||{};const td=await apiGet('getPermissionLetterTemplate',{token:state.token});
+    if(!window.confirm(`JANA SURAT KEBENARAN\n\nAktiviti: ${a.NAMA_AKTIVITI||'Aktiviti'}\nJumlah peserta: ${peserta.length}\n\nTeruskan?`))return;
+    const w=window.open('','_blank');if(!w){toast('Popup disekat. Benarkan pop-up untuk e-KOSSTA.');return;}
+    const pages=peserta.map((p,i)=>`<section class="permission-page">${suratTplReplace_(td.html||'',a,p,td)}<div class="page-no">Surat ${i+1} daripada ${peserta.length}</div></section>`).join('');
+    w.document.open();w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Surat Kebenaran</title><style>@page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;background:#e5e7eb;color:#111;font-family:Arial,sans-serif}.permission-page{width:210mm;min-height:297mm;padding:18mm;background:#fff;margin:0 auto;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.page-no{position:absolute;bottom:8mm;right:12mm;font-size:8pt;color:#777}@media screen{body{padding:20px}.permission-page{box-shadow:0 3px 18px rgba(0,0,0,.18);margin-bottom:20px}}@media print{body{background:#fff}.permission-page{margin:0;box-shadow:none}}</style></head><body>${pages}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));</script></body></html>`);w.document.close();w.focus();toast('Surat sedia untuk Print / Save as PDF.');
   }catch(e){toast(e.message||'Gagal menjana surat kebenaran.');}
 }
 
