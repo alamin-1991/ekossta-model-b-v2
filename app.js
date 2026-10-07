@@ -334,7 +334,7 @@
       'getPenempatan','getAktiviti','getPencapaian','getPesertaAktiviti',
       'getAjkUnit','getLaporanAktiviti','getCalendar','getKalendar',
       'getGaleri','getSurat','getUsers','getSettings','getReportTheme',
-      'getPermissionLetterTemplate','getPermissionLetterEditorData',
+      
       'getFactoryResetStatus'
     ]);
     const EK_SERVER_WRITES = /^(save|create|update|delete|remove|reset|factoryReset|import|clear|assign|register|mark|submit)/i;
@@ -4557,7 +4557,7 @@ async function saveKehadiranPage(){const unit=document.getElementById('att-unit'
 function renderAktivitiPage(){const c=document.getElementById('page-aktiviti');if(!c)return;c.innerHTML=`<div id="act-list-view"><div class="ck-module"><div class="ck-head"><div><div class="ck-kicker">Kokurikulum</div><h1 class="ck-title">Aktiviti & Acara</h1><p class="ck-sub">Daftar aktiviti, acara dan program kokurikulum.</p></div><div class="ck-actions"><button class="ck-btn" onclick="loadAktivitiPage()"><i class="fa-solid fa-rotate"></i> Segar</button><button class="ck-btn ck-btn-primary" onclick="openActivityForm()"><i class="fa-solid fa-calendar-plus"></i> Tambah Aktiviti</button></div></div><div class="ck-filter"><div class="ck-filter-grid"><div class="ck-field"><label>Carian</label><input id="act-search" placeholder="Nama aktiviti, tempat atau penganjur..." oninput="filterActivityTable()"></div><div class="ck-field"><label>Tahun</label><select id="act-year" onchange="loadAktivitiPage()"></select></div><div class="ck-field"><label>Peringkat</label><select id="act-level" onchange="filterActivityTable()"><option value="">Semua Peringkat</option><option>SEKOLAH</option><option>DAERAH</option><option>NEGERI</option><option>KEBANGSAAN</option></select></div><button class="ck-btn" onclick="resetActivityFilter()"><i class="fa-solid fa-rotate-left"></i> Reset</button></div></div><div class="ck-card"><div class="ck-toolbar"><div><div class="ck-toolbar-title">Senarai Aktiviti</div><div id="act-count" class="ck-count">Memuatkan...</div></div></div><div class="ck-table-wrap"><table class="ck-table"><thead><tr><th>Aktiviti</th><th>Tarikh</th><th>Tempat</th><th>Peringkat</th><th>Guru</th><th>Tindakan</th></tr></thead><tbody id="act-body"></tbody></table></div></div></div></div><div id="act-form-view" style="display:none"></div>`;loadAktivitiPage()}
 
 async function loadAktivitiPage(){try{const [a,u,g]=await Promise.all([server('getActivities',getMuridSessionToken(),{}),server('getUnits',getMuridSessionToken(),{}),server('getGuru',getMuridSessionToken())]);CK_ACT=ckParse(a);CK_UNITS=ckParse(u);CK_GURU=ckParse(g);document.getElementById('act-year').innerHTML='<option value="">Semua Tahun</option>'+ckYearOptions(CK_ACT);filterActivityTable()}catch(e){showToast(e.message||'Gagal memuatkan aktiviti','error')}}
-function filterActivityTable(){const q=(document.getElementById('act-search')?.value||'').toUpperCase(),y=document.getElementById('act-year')?.value||'',l=document.getElementById('act-level')?.value||'';let r=(CK_ACT||[]).filter(x=>(!y||String(new Date(x.TARIKH).getFullYear())===y)&&(!l||String(x.PERINGKAT||'').toUpperCase()===l)&&(!q||[x.NAMA_AKTIVITI,x.TEMPAT,x.NO_GURU,x.PERINGKAT].some(v=>String(v||'').toUpperCase().includes(q))));const b=document.getElementById('act-body');if(!b)return;setText('act-count',`${r.length} aktiviti`);b.innerHTML=r.length?r.map(x=>`<tr><td><button type="button" class="ck-link-btn" onclick='openActivityParticipants(${JSON.stringify(x.AKTIVITI_ID)})'>${escapeHtml(x.NAMA_AKTIVITI||'-')}</button><div class="ck-meta">${escapeHtml(x.OBJEKTIF||'')}</div></td><td>${ckDateMY(x.TARIKH)}<div class="ck-meta">${escapeHtml(x.HARI||'')} · ${escapeHtml(x.MASA||'')}</div></td><td>${escapeHtml(x.TEMPAT||'-')}</td><td><span class="ck-badge pending">${escapeHtml(x.PERINGKAT||'-')}</span></td><td>${escapeHtml(x.NO_GURU||'-')}</td><td><div class="ck-icon-actions"><button class="ck-icon" title="Peserta" onclick='openActivityParticipants(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-people-group"></i></button><button class="ck-icon" title="Jana Surat Kebenaran" onclick='openActivityPermissionLetter(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-file-signature"></i></button>${getMuridCurrentRole()==='ADMIN'?`<button class="ck-icon" title="Edit Template Surat" onclick='openPermissionLetterTemplateEditor(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-file-pen"></i></button>`:''}<button class="ck-icon" title="Edit" onclick='openActivityForm(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-pen"></i></button></div></td></tr>`).join(''):'<tr><td colspan="6"><div class="ck-empty"><i class="fa-solid fa-calendar-xmark"></i><div>Tiada aktiviti ditemui</div></div></td></tr>'}
+function filterActivityTable(){const q=(document.getElementById('act-search')?.value||'').toUpperCase(),y=document.getElementById('act-year')?.value||'',l=document.getElementById('act-level')?.value||'';let r=(CK_ACT||[]).filter(x=>(!y||String(new Date(x.TARIKH).getFullYear())===y)&&(!l||String(x.PERINGKAT||'').toUpperCase()===l)&&(!q||[x.NAMA_AKTIVITI,x.TEMPAT,x.NO_GURU,x.PERINGKAT].some(v=>String(v||'').toUpperCase().includes(q))));const b=document.getElementById('act-body');if(!b)return;setText('act-count',`${r.length} aktiviti`);b.innerHTML=r.length?r.map(x=>`<tr><td><button type="button" class="ck-link-btn" onclick='openActivityParticipants(${JSON.stringify(x.AKTIVITI_ID)})'>${escapeHtml(x.NAMA_AKTIVITI||'-')}</button><div class="ck-meta">${escapeHtml(x.OBJEKTIF||'')}</div></td><td>${ckDateMY(x.TARIKH)}<div class="ck-meta">${escapeHtml(x.HARI||'')} · ${escapeHtml(x.MASA||'')}</div></td><td>${escapeHtml(x.TEMPAT||'-')}</td><td><span class="ck-badge pending">${escapeHtml(x.PERINGKAT||'-')}</span></td><td>${escapeHtml(x.NO_GURU||'-')}</td><td><div class="ck-icon-actions"><button class="ck-icon" title="Peserta" onclick='openActivityParticipants(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-people-group"></i></button><button class="ck-icon" title="Jana Surat Kebenaran" onclick='openActivityPermissionLetter(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-file-signature"></i></button><button class="ck-icon" title="Edit" onclick='openActivityForm(${JSON.stringify(x.AKTIVITI_ID)})'><i class="fa-solid fa-pen"></i></button></div></td></tr>`).join(''):'<tr><td colspan="6"><div class="ck-empty"><i class="fa-solid fa-calendar-xmark"></i><div>Tiada aktiviti ditemui</div></div></td></tr>'}
 function resetActivityFilter(){document.getElementById('act-search').value='';document.getElementById('act-year').value='';document.getElementById('act-level').value='';filterActivityTable()}
 function openActivityForm(id){const r=(CK_ACT||[]).find(x=>String(x.AKTIVITI_ID)===String(id));const list=document.getElementById('act-list-view'),view=document.getElementById('act-form-view');if(!list||!view)return;view.innerHTML=`<div class="ck-module"><div class="ck-head"><div><div class="ck-kicker">Kokurikulum · Aktiviti & Acara</div><h1 class="ck-title">${r?'Kemaskini Aktiviti':'Tambah Aktiviti'}</h1><p class="ck-sub">Lengkapkan maklumat aktiviti dan simpan sebagai rekod kokurikulum.</p></div><div class="ck-actions"><button type="button" class="ck-btn" onclick="closeActivityForm()"><i class="fa-solid fa-arrow-left"></i> Kembali ke Aktiviti & Acara</button></div></div><div class="ck-card"><form id="act-form" onsubmit="submitActivityForm(event)"><div class="ck-dialog-body"><div class="ck-grid"><div class="ck-field full"><label>Nama Aktiviti *</label><input id="act-name" required></div><div class="ck-field"><label>Tarikh *</label><input id="act-date" type="date" required></div><div class="ck-field"><label>Masa</label><input id="act-time" type="time"></div><div class="ck-field"><label>Tempat</label><input id="act-place"></div><div class="ck-field"><label>Peringkat *</label><select id="act-level-form" required><option value="">Pilih</option><option>SEKOLAH</option><option>DAERAH</option><option>NEGERI</option><option>KEBANGSAAN</option></select></div><div class="ck-field"><label>Penganjur / Guru</label><select id="act-teacher"><option value="">Pilih guru</option>${((CK_GURU||[]).filter(x=>String(x.STATUS||'AKTIF').toUpperCase()==='AKTIF')).map(x=>`<option value="${escapeHtml(x.NO_GURU)}">${escapeHtml(x.NAMA)} · ${escapeHtml(x.NO_GURU)}</option>`).join('')}</select></div><div class="ck-field full"><label>Objektif</label><textarea id="act-objective"></textarea></div><div class="ck-field full"><label>Aktiviti</label><textarea id="act-detail"></textarea></div><div class="ck-field full"><label>Impak</label><textarea id="act-impact"></textarea></div></div></div><div class="ck-dialog-foot" style="justify-content:flex-end;gap:10px"><button type="button" class="ck-btn" onclick="closeActivityForm()"><i class="fa-solid fa-arrow-left"></i> Kembali</button><button class="ck-btn ck-btn-primary" id="act-save"><i class="fa-solid fa-floppy-disk"></i> Simpan Aktiviti</button></div></form></div></div>`;if(r){document.getElementById('act-name').value=r.NAMA_AKTIVITI||'';document.getElementById('act-date').value=ckEscapeDate(r.TARIKH);document.getElementById('act-time').value=r.MASA||'';document.getElementById('act-place').value=r.TEMPAT||'';document.getElementById('act-level-form').value=r.PERINGKAT||'';document.getElementById('act-teacher').value=r.NO_GURU||'';document.getElementById('act-objective').value=r.OBJEKTIF||'';document.getElementById('act-detail').value=r.AKTIVITI||'';document.getElementById('act-impact').value=r.IMPAK||''}view.dataset.id=id||'';list.style.display='none';view.style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
 function closeActivityForm(){const list=document.getElementById('act-list-view'),view=document.getElementById('act-form-view');if(view){view.style.display='none';view.innerHTML='';}if(list){list.style.display='block';}loadAktivitiPage()}
@@ -6007,10 +6007,10 @@ function syxResetAuditFilter(){document.getElementById('syxAuditSearch').value='
 function syxShowAudit(i){var r=(window.SYX_AUDIT_FILTERED||[])[i];if(!r)return;var b=document.getElementById('syxAuditModal');b.className='syx-modal';b.style.display='flex';b.innerHTML='<div class="syx-dialog"><div class="syx-dialog-head"><b>Butiran Audit</b><button class="syx-close" onclick="this.closest(\'.syx-modal\').style.display=\'none\'">×</button></div><div class="syx-item"><div class="syx-item-main"><div class="syx-item-title">'+syxEsc(r.ACTION)+' · '+syxEsc(r.MODULE)+'</div><div class="syx-item-meta">'+syxDate(r.CREATED_AT)+' · '+syxEsc(r.USER_ID||'SYSTEM')+'</div></div></div><div class="syx-log-detail">'+syxEsc(r.DETAIL||'Tiada butiran')+'</div></div>';}
 
 /* =========================================================
-   PATCH SURAT KEBENARAN + BUANG SLIP/KALENDAR
-   Berdasarkan Index asal.
-   Modul lain dikekalkan.
-========================================================= */
+   e-KOSSTA V2.5 — SURAT KEBENARAN
+   Hanya fungsi Jana Surat.
+   Editor Template telah dikeluarkan.
+   ========================================================= */
 
 async function openActivityPermissionLetter(activityId) {
   try {
@@ -6019,221 +6019,7 @@ async function openActivityPermissionLetter(activityId) {
       return;
     }
 
-    const d = ckParse(await server(
-      'getPermissionLetterEditorData',
-      getMuridSessionToken(),
-      activityId
-    )) || {};
-
-    const peserta = d.peserta || [];
-    const activity = d.activity || {};
-    const school = d.school || {};
-    const template = d.template || '';
-    SLTR_STATE.activity = activity;
-    SLTR_STATE.school = school;
-    SLTR_STATE.logoDataUrl = d.logoDataUrl || '';
-    SLTR_STATE.lineHeight = 1.3;
-
-    if (!peserta.length) {
-      showToast('Tiada peserta berdaftar untuk aktiviti ini.', 'warning');
-      return;
-    }
-
-    const nama = activity.NAMA_AKTIVITI || 'Aktiviti';
-    const teruskan = window.confirm(
-      'JANA SURAT KEBENARAN\n\n' +
-      'Aktiviti: ' + nama + '\n' +
-      'Jumlah peserta: ' + peserta.length + '\n\n' +
-      'Surat akan dijana untuk cetakan menggunakan template yang ditetapkan ADMIN.\n\n' +
-      'Teruskan?'
-    );
-    if (!teruskan) return;
-
-    const w = window.open('', '_blank');
-    if (!w) {
-      showToast('Popup disekat oleh browser. Benarkan pop-up untuk ' + ekAppName() + '.', 'warning');
-      return;
-    }
-
-    const base = template || '<p>Template surat belum ditetapkan.</p>';
-    const pages = peserta.map(function(p) {
-      return sltrReplace(base, activity, p, school);
-    }).join('<div class="sltr-break"></div>');
-
-    const css = '<style>' +
-      '@page{size:A4;margin:0}' +
-      'html,body{margin:0;padding:0;background:#eee;color:#111;font-family:Arial,sans-serif}' +
-      '.sltr-print-page{box-sizing:border-box;width:210mm;min-height:297mm;padding:18mm;background:#fff;margin:0 auto;page-break-after:always;font-size:11pt;line-height:1.3}' +
-      '.sltr-print-page:last-child{page-break-after:auto}' +
-      '.sltr-print-page table{width:100%;border-collapse:collapse;margin:10px 0}' +
-      '.sltr-print-page th,.sltr-print-page td{border:1px solid #777;padding:6px;vertical-align:top}' +
-      '.sltr-print-page th{background:transparent;color:#111}' +
-      '.sltr-print-page p{margin:0 0 8px}' +
-      '.sltr-print-page img{max-width:100%}' +
-      '.sltr-break{display:none}' +
-      '@media print{body{background:#fff}.sltr-print-page{margin:0;box-shadow:none}}' +
-      '</style>';
-
-    const wrapped = pages.split('<div class="sltr-break"></div>').map(function(x) {
-      return '<div class="sltr-print-page">' + x + '</div>';
-    }).join('');
-
-    w.document.open();
-    w.document.write('<!doctype html><html><head><title>Surat Kebenaran - ' +
-      escapeHtml(nama) + '</title>' + css + '</head><body>' + wrapped + '</body></html>');
-    w.document.close();
-    setTimeout(function(){ w.focus(); w.print(); }, 600);
-
-    showToast('Surat kebenaran sedia untuk dicetak.', 'success');
-  } catch (e) {
-    console.error('openActivityPermissionLetter:', e);
-    showToast(e.message || 'Gagal menjana surat kebenaran.', 'error');
-  }
-}
-
-async function openPermissionLetterTemplateEditor(activityId) {
-  try {
-    if (getMuridCurrentRole() !== 'ADMIN') {
-      showToast('Hanya ADMIN boleh mengedit template Surat Kebenaran.', 'error');
-      return;
-    }
-    if (!activityId) {
-      showToast('ID aktiviti tidak sah.', 'error');
-      return;
-    }
-    sltrBuildModal();
-    const status = document.getElementById('sltrStatus');
-    if (status) status.textContent = 'Memuatkan template...';
-    const d = ckParse(await server(
-      'getPermissionLetterEditorData',
-      getMuridSessionToken(),
-      activityId
-    )) || {};
-    sltrDataCache = d;
-    SLTR_STATE.activity = d.activity || {};
-    SLTR_STATE.peserta = d.peserta || [];
-    SLTR_STATE.school = d.school || {};
-    SLTR_STATE.logoDataUrl = d.logoDataUrl || '';
-    SLTR_STATE.lineHeight = 1.3;
-    document.getElementById('sltrModal').classList.add('open');
-    await sltrLoad();
-  } catch (e) {
-    showToast(e.message || 'Gagal membuka editor template surat.', 'error');
-  }
-}
-
-
-
-
-
-let SLTR_STATE={activity:null,peserta:[],template:'',school:{},logoDataUrl:'',lineHeight:1.35,tableBorder:true};
-let sltrDataCache=null;
-function sltrFmtDate(v){try{return v?new Date(v).toLocaleDateString('ms-MY',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';}catch(e){return v||'-';}}
-function sltrActivityMap(a,p,s){return {'SEKOLAH':s.name||'', 'ALAMAT_SEKOLAH':s.address||'', 'TELEFON_SEKOLAH':s.phone||'', 'EMAIL_SEKOLAH':s.email||'', 'NAMA_MURID':p.NAMA||'', 'NO_KP':p.NO_KP||'', 'KELAS':p.KELAS||'', 'TINGKATAN':p.TINGKATAN||'', 'AKTIVITI':a.NAMA_AKTIVITI||'', 'TARIKH':sltrFmtDate(a.TARIKH), 'MASA':a.MASA||'', 'TEMPAT':a.TEMPAT||'', 'PERINGKAT':a.PERINGKAT||'', 'ANJURAN':a.NO_GURU||''};}
-function sltrReplace(html,a,p,s){let out=String(html||'');const m=sltrActivityMap(a,p,s);Object.keys(m).forEach(k=>{out=out.replace(new RegExp('{{\\s*'+k+'\\s*}}','g'),function(){return m[k];});});if(SLTR_STATE.logoDataUrl&&!/<img[^>]+data-logo="school"/i.test(out)){out='<div style="text-align:center;margin-bottom:8px"><img data-logo="school" src="'+SLTR_STATE.logoDataUrl+'" style="max-width:70px;max-height:80px;object-fit:contain"></div>'+out;}return out;}
-function sltrSelectedTable(){const sel=window.getSelection();if(!sel||!sel.anchorNode)return null;let el=sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement;return el?el.closest('table'):null;}
-function sltrApplyLineHeight(v){SLTR_STATE.lineHeight=Number(v)||1.35;const ed=document.getElementById('sltrEditor');if(ed)ed.style.lineHeight=SLTR_STATE.lineHeight;}
-function sltrSetZoom(v){const ed=document.getElementById('sltrEditor');if(!ed)return;ed.style.transform='scale('+Number(v||1)+')';ed.style.transformOrigin='top center';}
-function sltrTableColorNone(){const t=sltrSelectedTable();if(!t){showToast('Klik dahulu dalam jadual.','warning');return;}t.querySelectorAll('th,td').forEach(c=>{c.style.background='transparent';c.style.color='#111';});}
-function sltrTableBorder(on){const t=sltrSelectedTable();if(!t){showToast('Klik dahulu dalam jadual.','warning');return;}t.querySelectorAll('th,td').forEach(c=>{c.style.border=on?'1px solid #777':'0 solid transparent';});SLTR_STATE.tableBorder=on;}
-function sltrAddRow(){const t=sltrSelectedTable();if(!t){showToast('Klik dahulu dalam jadual.','warning');return;}const body=t.tBodies[0]||t.createTBody();const cols=(t.rows[0]&&t.rows[0].cells.length)||2;const tr=body.insertRow(-1);for(let i=0;i<cols;i++){const td=tr.insertCell(-1);td.innerHTML='Teks';td.style.border=SLTR_STATE.tableBorder?'1px solid #777':'0 solid transparent';td.style.padding='6px';}sltrSelectTable(t);}
-function sltrDeleteRow(){const t=sltrSelectedTable();if(!t){showToast('Klik dahulu dalam jadual.','warning');return;}const sel=window.getSelection();let el=sel&&sel.anchorNode?(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement):null;const tr=el&&el.closest('tr');if(tr)tr.remove();else if(t.rows.length)t.deleteRow(t.rows.length-1);sltrSelectTable(t);}
-function sltrAddTable(){const ed=document.getElementById('sltrEditor');if(!ed)return;ed.focus();document.execCommand('insertHTML',false,'<table class="sltr-table" style="width:100%"><tbody><tr><td>Bil.</td><td>Maklumat</td><td>Butiran</td></tr><tr><td>1</td><td>Item</td><td>Butiran</td></tr></tbody></table><p><br></p>');const t=ed.querySelector('table:last-of-type');if(t)sltrSelectTable(t);}
-function sltrSelectTable(t){document.querySelectorAll('#sltrEditor table').forEach(x=>x.classList.remove('sltr-selected-table'));if(!t)return;t.classList.add('sltr-selected-table');sltrShowTableHandles(t);}
-function sltrClearTableHandles(){document.querySelectorAll('.sltr-table-handle,.sltr-table-resize').forEach(x=>x.remove());document.querySelectorAll('#sltrEditor table').forEach(x=>x.classList.remove('sltr-selected-table'));}
-function sltrShowTableHandles(t){sltrClearTableHandles();if(!t)return;const ed=document.getElementById('sltrEditor');if(!ed)return;const er=ed.getBoundingClientRect(),tr=t.getBoundingClientRect();const scrollLeft=ed.scrollLeft,scrollTop=ed.scrollTop;const tableLeft=tr.left-er.left+scrollLeft,tableTop=tr.top-er.top+scrollTop;const tableWidth=t.offsetWidth,tableHeight=t.offsetHeight;
- const cells=t.rows[0]?Array.from(t.rows[0].cells):[];if(cells.length>1){let x=0;for(let i=0;i<cells.length-1;i++){x+=cells[i].offsetWidth;const h=document.createElement('div');h.className='sltr-table-handle';h.style.left=(tableLeft+x-2)+'px';h.style.top=tableTop+'px';h.style.height=tableHeight+'px';h.title='Tarik untuk ubah lebar lajur';h.dataset.col=i;h.dataset.table='1';h.addEventListener('pointerdown',sltrStartColumnResize);ed.appendChild(h);}}
- const r=document.createElement('div');r.className='sltr-table-resize';r.style.left=(tableLeft+tableWidth-6)+'px';r.style.top=(tableTop+tableHeight-6)+'px';r.title='Tarik untuk ubah saiz jadual';r.addEventListener('pointerdown',sltrStartTableResize);ed.appendChild(r);}
-function sltrStartColumnResize(e){e.preventDefault();e.stopPropagation();const t=sltrSelectedTable();if(!t)return;const idx=Number(e.currentTarget.dataset.col||0);const startX=e.clientX;const startW=t.offsetWidth;const firstRow=t.rows[0];const startWidths=Array.from(firstRow.cells).map(c=>c.offsetWidth);function move(ev){const dx=ev.clientX-startX;const min=45;let nw=Math.max(min,startWidths[idx]+dx);const next=Math.max(min,startWidths[idx+1]-dx);const total=startWidths[idx]+startWidths[idx+1];if(nw>total-min)nw=total-min;firstRow.cells[idx].style.width=nw+'px';firstRow.cells[idx+1].style.width=(total-nw)+'px';Array.from(t.rows).forEach(row=>{if(row.cells[idx])row.cells[idx].style.width=nw+'px';if(row.cells[idx+1])row.cells[idx+1].style.width=(total-nw)+'px';});sltrShowTableHandles(t);}function up(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);}document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);}
-function sltrStartTableResize(e){e.preventDefault();e.stopPropagation();const t=sltrSelectedTable();if(!t)return;const startX=e.clientX,startY=e.clientY,startW=t.offsetWidth,startH=t.offsetHeight;function move(ev){const nw=Math.max(180,startW+(ev.clientX-startX));const nh=Math.max(40,startH+(ev.clientY-startY));t.style.width=nw+'px';t.style.height=nh+'px';sltrShowTableHandles(t);}function up(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);}document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);}
-function sltrInitTableInteractions(){const ed=document.getElementById('sltrEditor');if(!ed||ed.dataset.tableInit==='1')return;ed.dataset.tableInit='1';ed.addEventListener('click',function(e){const t=e.target.closest('table');if(t)sltrSelectTable(t);else sltrClearTableHandles();});ed.addEventListener('scroll',function(){const t=sltrSelectedTable();if(t)sltrShowTableHandles(t);});window.addEventListener('resize',function(){const t=sltrSelectedTable();if(t)sltrShowTableHandles(t);});}
-function sltrExec(cmd,val){const ed=document.getElementById('sltrEditor');if(!ed)return;ed.focus();document.execCommand(cmd,false,val||null);}
-function sltrInsertToken(tok){const ed=document.getElementById('sltrEditor');if(!ed)return;ed.focus();document.execCommand('insertText',false,'{{'+tok+'}}');}
-function sltrBuildModal(){if(document.getElementById('sltrModal'))return;const modal=document.createElement('div');modal.id='sltrModal';modal.className='sltr-modal';modal.innerHTML='<div class="sltr-dialog"><div class="sltr-head"><div><h2>Editor Surat Kebenaran</h2><small>Editor A4 seperti Word — KHAS ADMIN. Teks dan sel jadual boleh diedit terus.</small></div><button class="sltr-close" onclick="sltrClose()">×</button></div><div class="sltr-toolbar"><button class="sltr-tool" onclick="sltrExec(\'bold\')"><b>B</b></button><button class="sltr-tool" onclick="sltrExec(\'italic\')"><i>I</i></button><button class="sltr-tool" onclick="sltrExec(\'underline\')"><u>U</u></button><select class="sltr-select" onchange="sltrExec(\'fontName\',this.value)"><option>Arial</option><option>Calibri</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option></select><select class="sltr-select" onchange="sltrExec(\'fontSize\',this.value)"><option value="2">10</option><option value="3" selected>12</option><option value="4">14</option><option value="5">18</option><option value="6">24</option></select><button class="sltr-tool" onclick="sltrExec(\'justifyLeft\')">Kiri</button><button class="sltr-tool" onclick="sltrExec(\'justifyCenter\')">Tengah</button><button class="sltr-tool" onclick="sltrExec(\'justifyRight\')">Kanan</button><button class="sltr-tool" onclick="sltrExec(\'justifyFull\')">Justify</button><span class="sltr-sep"></span><select class="sltr-select" onchange="sltrApplyLineHeight(this.value)"><option value="1">1.0</option><option value="1.15">1.15</option><option value="1.3" selected>1.3</option><option value="1.5">1.5</option><option value="1.75">1.75</option><option value="2">2.0</option></select><span class="sltr-sep"></span><button class="sltr-tool" onclick="sltrAddTable()">+ Jadual</button><button class="sltr-tool" onclick="sltrAddRow()">+ Baris</button><button class="sltr-tool" onclick="sltrDeleteRow()">− Baris</button><button class="sltr-tool" onclick="sltrTableColorNone()">Jadual Tiada Warna</button><button class="sltr-tool" onclick="sltrTableBorder(true)">Border</button><button class="sltr-tool" onclick="sltrTableBorder(false)">Tiada Border</button><span class="sltr-sep"></span><span class="sltr-a4-info">A4 210 × 297 mm</span><select class="sltr-select" title="Zum paparan A4" onchange="sltrSetZoom(this.value)"><option value="0.75">75%</option><option value="0.85">85%</option><option value="0.9">90%</option><option value="1" selected>100%</option><option value="1.1">110%</option></select><span class="sltr-status" id="sltrStatus"></span></div><div class="sltr-body"><aside class="sltr-side"><h3>Placeholder</h3><p>Klik token untuk memasukkannya pada kedudukan kursor.</p><div class="sltr-token-list">'+['SEKOLAH','ALAMAT_SEKOLAH','NAMA_MURID','NO_KP','KELAS','TINGKATAN','AKTIVITI','TARIKH','MASA','TEMPAT','PERINGKAT','ANJURAN'].map(function(x){return '<button class="sltr-token" onclick="sltrInsertToken(\''+x+'\')">{{'+x+'}}</button>';}).join('')+'</div><hr style="border:0;border-top:1px solid var(--border);margin:14px 0"><p><b>Tip:</b> Klik sel jadual dahulu sebelum menggunakan kawalan jadual.</p></aside><main class="sltr-canvas"><div id="sltrEditor" class="sltr-page" contenteditable="true" spellcheck="false"></div></main></div><div class="sltr-foot"><div class="left"><button class="sltr-btn" onclick="sltrReset()">Tetapan Asal</button><button class="sltr-btn" onclick="sltrLoad()">Muat Semula</button><button class="sltr-btn primary" onclick="sltrSave()">Simpan Template</button></div><div class="right"><button class="sltr-btn success" onclick="sltrPrint()"><i class="fa-solid fa-print"></i> Pratonton / Cetak</button><button class="sltr-btn" onclick="sltrClose()">Tutup</button></div></div></div>';document.body.appendChild(modal);}
-async function sltrLoad(){const ed=document.getElementById('sltrEditor');if(!ed)return;ed.innerHTML=(sltrDataCache&&sltrDataCache.template)||'<p>Template kosong.</p>';ed.style.lineHeight=SLTR_STATE.lineHeight;sltrInitTableInteractions();sltrClearTableHandles();const st=document.getElementById('sltrStatus');if(st)st.textContent='A4 sebenar 210 × 297 mm • Template dimuatkan.';}
-async function openActivityPermissionLetter(activityId){try{sltrBuildModal();const status=document.getElementById('sltrStatus');if(status)status.textContent='Memuatkan editor...';const d=ckParse(await server('getPermissionLetterEditorData',getMuridSessionToken(),activityId))||{};sltrDataCache=d;SLTR_STATE.activity=d.activity||{};SLTR_STATE.peserta=d.peserta||[];SLTR_STATE.school=d.school||{};SLTR_STATE.logoDataUrl=d.logoDataUrl||'';SLTR_STATE.lineHeight=1.35;document.getElementById('sltrModal').classList.add('open');await sltrLoad();}catch(e){showToast(e.message||String(e),'error');}}
-function sltrClose(){const m=document.getElementById('sltrModal');if(m)m.classList.remove('open');}
-async function sltrSave(){if(getMuridCurrentRole()!=='ADMIN'){showToast('Hanya ADMIN boleh menyimpan template surat.','error');return;}try{const ed=document.getElementById('sltrEditor');if(!ed)return;const html=ed.innerHTML;const d=ckParse(await server('savePermissionLetterTemplate',getMuridSessionToken(),html))||{};sltrDataCache=Object.assign({},sltrDataCache,{template:d.html||html});const st=document.getElementById('sltrStatus');if(st)st.textContent='Template berjaya disimpan.';showToast('Template surat berjaya disimpan.','success');}catch(e){showToast(e.message||String(e),'error');}}
-async function sltrReset(){if(getMuridCurrentRole()!=='ADMIN'){showToast('Hanya ADMIN boleh menetapkan semula template surat.','error');return;}if(!confirm('Tetapkan semula template surat kepada template asal?'))return;try{const d=ckParse(await server('resetPermissionLetterTemplate',getMuridSessionToken()))||{};sltrDataCache=Object.assign({},sltrDataCache,{template:d.html||''});await sltrLoad();showToast('Template surat dikembalikan kepada asal.','success');}catch(e){showToast(e.message||String(e),'error');}}
-function sltrPrint(){const ed=document.getElementById('sltrEditor');if(!ed)return;const base=ed.innerHTML;const pages=SLTR_STATE.peserta.length?SLTR_STATE.peserta.map(function(p){return sltrReplace(base,SLTR_STATE.activity,p,SLTR_STATE.school);}).join('<div class="sltr-break"></div>'):sltrReplace(base,SLTR_STATE.activity,{},SLTR_STATE.school);const w=window.open('','_blank');if(!w){showToast('Popup disekat oleh browser.','warning');return;}const css='<style>@page{size:A4;margin:0}body{margin:0;background:#fff;color:#111;font-family:Arial,sans-serif}.sltr-print-page{box-sizing:border-box;width:210mm;min-height:297mm;padding:18mm;page-break-after:always;font-size:11pt;line-height:'+SLTR_STATE.lineHeight+'}.sltr-print-page:last-child{page-break-after:auto}.sltr-print-page table{border-collapse:collapse;margin:10px 0;table-layout:fixed}.sltr-print-page th,.sltr-print-page td{border:1px solid #777;padding:6px;vertical-align:top;overflow-wrap:anywhere}.sltr-print-page th{background:transparent}.sltr-print-page p{margin:0 0 8px}.sltr-print-page img{max-width:100%}.sltr-break{display:none}</style>';const wrapped=pages.split('<div class="sltr-break"></div>').map(function(x){return '<div class="sltr-print-page">'+x+'</div>';}).join('');w.document.open();w.document.write('<!doctype html><html><head><title>Surat Kebenaran</title>'+css+'</head><body>'+wrapped+'</body></html>');w.document.close();setTimeout(function(){w.focus();w.print();},500);}
-
-
-
-let FR_CONFIRMATION_PHRASE='';
-function frEsc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function frRenderBreakdown(id,tables){const el=document.getElementById(id);if(!el)return;const obj=tables||{};const keys=Object.keys(obj);el.innerHTML=keys.length?keys.map(function(k){return '<span><b>'+frEsc(k)+'</b>: '+Number(obj[k]||0)+'</span>';}).join(''):'Tiada rekod.';}
-function frSetPhraseUI(phrase){FR_CONFIRMATION_PHRASE=String(phrase||'').trim();const cfg=document.getElementById('frConfirmationPhrase'),target=document.getElementById('frConfirmationTarget'),hint=document.getElementById('frPhraseHint');if(cfg)cfg.value=FR_CONFIRMATION_PHRASE;if(target)target.textContent=FR_CONFIRMATION_PHRASE||'Belum ditetapkan';if(hint)hint.textContent='Ayat semasa: '+(FR_CONFIRMATION_PHRASE||'Belum ditetapkan')+'. Hanya ADMIN boleh mengubahnya.';}
-async function frLoadConfirmationPhrase(){try{const d=tsJson(await server('getFactoryResetConfirmation',tsToken()))||{};frSetPhraseUI(d.phrase||'');}catch(e){const h=document.getElementById('frPhraseHint');if(h)h.textContent=e.message||String(e);}}
-async function frSaveConfirmationPhrase(){const input=document.getElementById('frConfirmationPhrase');const phrase=String(input?input.value:'').trim();if(!phrase){showToast('Sila masukkan ayat pengesahan.','warning');return;}if(phrase.length<8){showToast('Ayat pengesahan mesti sekurang-kurangnya 8 aksara.','warning');return;}if(phrase.length>160){showToast('Ayat pengesahan maksimum 160 aksara.','warning');return;}if(!confirm('Simpan ayat pengesahan baharu ini?'))return;try{const d=tsJson(await server('saveFactoryResetConfirmation',tsToken(),phrase))||{};frSetPhraseUI(d.phrase||phrase);showToast('Ayat pengesahan berjaya disimpan.','success');}catch(e){showToast(e.message||String(e),'error');}}
-async function frResetConfirmationPhrase(){const phrase='SAYA FAHAM DAN SETUJU UNTUK MEMADAM DATA';if(!confirm('Gunakan semula ayat pengesahan lalai ini?'))return;try{const d=tsJson(await server('saveFactoryResetConfirmation',tsToken(),phrase))||{};frSetPhraseUI(d.phrase||phrase);showToast('Ayat pengesahan dikembalikan kepada lalai.','success');}catch(e){showToast(e.message||String(e),'error');}}
-async function frLoadStatus(){
-  try{
-    const d=tsJson(await server('getFactoryResetStatus',tsToken()))||{};
-    const st=d.student||{},ac=d.activity||{},al=d.allOperational||{};
-    const a=document.getElementById('frStudentCount'),b=document.getElementById('frActivityCount'),c=document.getElementById('frAllCount');
-    if(a)a.textContent=Number(st.total||0);if(b)b.textContent=Number(ac.total||0);if(c)c.textContent=Number(al.total||0);
-    frRenderBreakdown('frStudentBreakdown',st.tables);frRenderBreakdown('frActivityBreakdown',ac.tables);frRenderBreakdown('frAllBreakdown',al.tables);
-    const status=document.getElementById('frStatus');if(status)status.textContent='Data semasa telah disemak. Reset tidak akan menyentuh data yang dilindungi.';
-    await frLoadConfirmationPhrase();
-  }catch(e){const st=document.getElementById('frStatus');if(st)st.textContent=e.message||String(e);showToast(e.message||String(e),'error');}
-}
-async function frReset(mode){
-  const input=document.getElementById('frConfirmation');
-  const confirmation=input?String(input.value||'').trim():'';
-  if(!FR_CONFIRMATION_PHRASE)await frLoadConfirmationPhrase();
-  if(confirmation!==FR_CONFIRMATION_PHRASE){showToast('Pengesahan tidak sepadan. Taip tepat ayat yang dipaparkan.','warning');if(input)input.focus();return;}
-  const labels={STUDENT:'DATA MURID & REKOD BERKAITAN',ACTIVITY:'AKTIVITI & LAPORAN',ALL_OPERATIONAL:'SEMUA DATA OPERASI'};
-  const label=labels[mode]||mode;
-  if(!confirm('AMARAN TERAKHIR\n\nAnda akan memadam '+label+'.\n\nData ini tidak boleh dipulihkan melalui sistem.\n\nTeruskan?'))return;
-  try{
-    const status=document.getElementById('frStatus');if(status)status.textContent='Sedang menjalankan reset...';
-    const d=tsJson(await server('factoryResetData',tsToken(),mode,confirmation))||{};
-    if(status)status.textContent='Reset berjaya. '+Number(d.total||0)+' rekod telah dipadam. Data master, akaun, audit dan import log dikekalkan.';
-    if(input)input.value='';showToast('Factory Reset berjaya dijalankan.','success');await frLoadStatus();
-  }catch(e){const st=document.getElementById('frStatus');if(st)st.textContent=e.message||String(e);showToast(e.message||String(e),'error');}
-}
-
-
-/* =========================================================
-   e-KOSSTA V2.5 FINAL PATCH — SURAT KEBENARAN
-   ---------------------------------------------------------
-   PATCH MODE:
-   - Jana Surat terus memanggil generator bulk.
-   - Tidak memanggil editor/template sebelum jana.
-   - Editor Template kekal fungsi berasingan.
-   - Mengelakkan ralat getSetting_ ketika klik Jana Surat.
-   ========================================================= */
-
-async function generatePermissionLettersBulkUI(activityId) {
-  try {
-    if (!activityId) {
-      showToast('ID aktiviti tidak sah.', 'error');
-      return;
-    }
-
-    const pesertaCheck = await server(
-      'getPermissionLetterPreview',
-      getMuridSessionToken(),
-      activityId
-    );
-    const preview = ckParse(pesertaCheck) || {};
-    const jumlah = Array.isArray(preview.peserta) ? preview.peserta.length : 0;
-
-    if (!jumlah) {
-      showToast('Tiada peserta berdaftar. Daftarkan peserta terlebih dahulu.', 'warning');
-      return;
-    }
-
-    const teruskan = window.confirm(
-      'JANA SURAT KEBENARAN\n\n' +
-      'Jumlah peserta: ' + jumlah + '\n\n' +
-      'Sistem akan menghasilkan satu PDF dengan satu halaman A4 bagi setiap peserta.\n\n' +
-      'Teruskan?'
-    );
-
-    if (!teruskan) return;
-
-    showToast('Sedang menjana surat untuk semua peserta...', 'info');
+    showToast('Sedang menjana surat kebenaran...', 'info');
 
     const raw = await server(
       'generatePermissionLettersBulk',
@@ -6248,7 +6034,7 @@ async function generatePermissionLettersBulkUI(activityId) {
 
     showToast(
       'Surat berjaya dijana untuk ' +
-      String(result.jumlahPeserta || jumlah) +
+      String(result.jumlahPeserta || 'semua') +
       ' peserta.',
       'success'
     );
@@ -6261,12 +6047,7 @@ async function generatePermissionLettersBulkUI(activityId) {
       );
     }
   } catch (e) {
-    console.error('generatePermissionLettersBulkUI:', e);
+    console.error('openActivityPermissionLetter:', e);
     showToast(e.message || 'Gagal menjana surat kebenaran.', 'error');
   }
-}
-
-/* OVERRIDE TERAKHIR: butang Jana Surat tidak lagi membuka editor. */
-async function openActivityPermissionLetter(activityId) {
-  return generatePermissionLettersBulkUI(activityId);
 }
