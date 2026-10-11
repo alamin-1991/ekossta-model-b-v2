@@ -718,3 +718,35 @@ html.dark-mode-active .attendance-kpi{background:var(--surface2)}
   .activity-participants-filter{grid-template-columns:1fr}
   .activity-participants-panel{padding:12px}
 }
+
+
+/* =========================================================
+   e-KOSSTA V2.6 — Rich Text Editor
+========================================================= */
+.editor-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}
+.editor-heading h2{font-size:24px;margin:5px 0}
+.editor-heading p{margin:0;line-height:1.5}
+.editor-kicker{font-size:10px;letter-spacing:.14em;font-weight:850;color:var(--primary)}
+.editor-heading-actions{display:flex;gap:7px;flex-wrap:wrap}
+.editor-meta-grid{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.editor-toolbar{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:14px 14px 0 0}
+.editor-toolbar button,.editor-toolbar select,.toolbar-color{min-height:34px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);padding:6px 9px;cursor:pointer;font-size:12px}
+.editor-toolbar button:hover{border-color:var(--primary);color:var(--primary)}
+.editor-toolbar select{width:auto;min-height:34px;padding:5px 8px}
+.toolbar-separator{width:1px;height:25px;background:var(--border);margin:0 3px}
+.toolbar-color{display:flex;align-items:center;gap:5px}
+.toolbar-color input{width:25px;height:24px;padding:0;border:0;background:transparent}
+.rich-editor{min-height:560px;padding:clamp(18px,4vw,42px);background:#fff;color:#222;border:1px solid var(--border);border-top:0;border-radius:0 0 14px 14px;outline:none;line-height:1.65;overflow-wrap:anywhere}
+.rich-editor:focus{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--primary) 20%,transparent)}
+.rich-editor h1,.rich-editor h2,.rich-editor h3{line-height:1.25;margin:1.1em 0 .5em}
+.rich-editor p{margin:.65em 0}
+.rich-editor table{min-width:0;width:100%;border-collapse:collapse;margin:12px 0}
+.rich-editor td,.rich-editor th{border:1px solid #999;padding:7px;text-align:left}
+.rich-editor ul,.rich-editor ol{padding-left:28px}
+.editor-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.editor-footer>div{display:flex;gap:7px;flex-wrap:wrap}
+.saved-documents{margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+.saved-documents h3{margin:0 0 4px}
+.saved-documents .table-wrap{margin-top:12px}
+.saved-documents table{min-width:620px}
+@media(max-width:700px){.editor-heading{flex-direction:column}.editor-heading-actions{width:100%}.editor-heading-actions .btn{flex:1}.editor-meta-grid{grid-template-columns:1fr}.editor-toolbar{gap:4px}.editor-toolbar button{padding:6px 8px}.rich-editor{min-height:420px;padding:18px}.editor-footer{align-items:stretch}.editor-footer>div{width:100%}.editor-footer>div .btn{flex:1}.approval-row{flex-direction:column;gap:8px}}

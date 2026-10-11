@@ -240,7 +240,7 @@ function showPage(page){
     penempatan:'Penempatan Unit',
     users:'Pengurusan Pengguna',
     analysis:'Analisis',
-    reports:'Laporan Aktiviti',
+    reports:'Editor Dokumen',
     activity:'Aktiviti & Acara',
     'activity-participants':'Daftar Peserta',
     'system-settings':'Tetapan Sistem',
@@ -265,6 +265,7 @@ function showPage(page){
   if($('mobileMenu') && !$('mobileMenu').hidden) buildMobileMenu_();
 
   if(page==='dashboard'){loadMurid();loadUnit();}
+  if(page==='reports')loadSavedDocuments_();
   if(page==='murid')loadMurid();
   if(page==='guru')loadGuru();
   if(page==='unit')loadUnit();
@@ -319,6 +320,14 @@ function init(){
   bind('activityForm','submit',saveAktiviti);
   bind('activityParticipantsBackBtn','click',()=>showPage('activity'));
   bind('activityParticipantsSaveBtn','click',saveAktivitiPeserta);
+  bind('docNewBtn','click',newEditorDocument_);
+  bind('docListRefreshBtn','click',loadSavedDocuments_);
+  bind('docSaveBtn','click',saveEditorDocument_);
+  bind('docPrintBtn','click',printEditorDocument_);
+  bind('editorLinkBtn','click',insertEditorLink_);
+  bind('editorBlockFormat','change',applyEditorBlockFormat_);
+  bind('editorTextColor','input',applyEditorTextColor_);
+  document.querySelectorAll('[data-editor-cmd]').forEach(btn=>btn.addEventListener('click',()=>runEditorCommand_(btn.dataset.editorCmd)));
   bind('activityParticipantClass','change',renderAktivitiPesertaTable_);
   bind('activityParticipantSearch','input',renderAktivitiPesertaTable_);
   document.querySelectorAll('[data-activity-close]').forEach(e=>e.addEventListener('click',closeAktivitiModal));
@@ -657,13 +666,31 @@ async function openAktivitiPermissionLetter(activityId){
       <table class="letter-table"><tr><th>Program</th><td>${safe(a.NAMA_AKTIVITI)}</td></tr><tr><th>Tarikh</th><td>${safe(date)}</td></tr><tr><th>Masa</th><td>${safe(a.MASA)}</td></tr><tr><th>Peringkat</th><td>${safe(a.PERINGKAT)}</td></tr><tr><th>Tempat</th><td>${safe(a.TEMPAT)}</td></tr></table>
       <p>2. Saya difahamkan bahawa soal keselamatan dan disiplin sentiasa diberi perhatian sewajarnya oleh Guru / Pegawai / Urusetia yang telah diamanahkan. Sekiranya kesihatan anak / jagaan saya terganggu dalam masa latihan, program atau perjalanan, maka saya dengan sepenuh hati membenarkan Guru / Pegawai / Urusetia menguruskan bagi pihak saya untuk mendapatkan rawatan perubatan.</p>
       <p>3. Saya dengan ini mengakui bahawa pelajar di atas <b>ADA / TIDAK ADA*</b> mengidap penyakit kronik / berjangkit. Nyatakan (jika ada): <span class="line long"></span></p>
-      <div class="signature-grid"><div>Tarikh: <span class="line short"></span><br><br>Tandatangan Ibu Bapa / Penjaga / Waris<br><br>____________________________</div><div>Tarikh: <span class="line short"></span><br><br>Nama Saksi: <span class="line"></span><br><br>Tandatangan Saksi<br><br>____________________________</div></div>
-      <div class="approval">Disahkan oleh Pengetua / Guru Besar / Cop rasmi:<br><br>____________________________________________</div>
+      <div class="signature-block">
+        <p>....................................................................................</p>
+        <p><b>Tandatangan Ibu Bapa/Penjaga*</b></p>
+        <p>Nama&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
+        <p>Tarikh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
+      </div>
+      <div class="witness-block">
+        <p class="section-label"><b>PENGAKUAN SAKSI</b></p>
+        <p>Saya dengan ini memperakukan bahawa sepanjang pengetahuan saya, segala keterangan di atas adalah benar.</p>
+        <p class="signature-dots">....................................................................................</p>
+        <p><b>Tandatangan Saksi/Guru pengiring*</b></p>
+        <p>Nama&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
+        <p>Tarikh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
+      </div>
+      <div class="approval">
+        <p class="signature-dots">............................................................</p>
+        <p><b>Disahkan oleh Pengetua</b></p>
+        <div class="approval-row"><span>Cop Rasmi&nbsp;&nbsp;&nbsp;&nbsp;:</span><span>Tarikh: ....................................</span></div>
+        <p>/ Guru Besar / Cop rasmi</p>
+      </div>
       <div class="page-no">Surat ${i+1} daripada ${peserta.length}</div>
     </section>`).join('');
     w.document.open();
     w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Surat Kebenaran - ${safe(nama)}</title><style>
-      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}.letter-table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px}.letter-table th,.letter-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}.letter-table th{width:28%;font-weight:700}.line{display:inline-block;min-width:180px;border-bottom:1px solid #555;height:14px}.line.short{min-width:120px}.line.long{display:block;width:100%;margin-top:4px}.signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:25px;font-size:11px;line-height:1.5}.approval{margin-top:25px;font-size:11px}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
+      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}.letter-table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px}.letter-table th,.letter-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}.letter-table th{width:28%;font-weight:700}.line{display:inline-block;min-width:180px;border-bottom:1px solid #555;height:14px}.line.short{min-width:120px}.line.long{display:block;width:100%;margin-top:4px}.signature-block,.witness-block,.approval{margin-top:18px;font-size:11px;line-height:1.45}.signature-block p,.witness-block p,.approval p{margin:5px 0}.witness-block{margin-top:22px}.section-label{margin-top:0!important}.signature-dots{margin-top:30px!important}.approval{margin-top:28px}.approval-row{display:flex;justify-content:space-between;gap:18px;margin-top:8px}.approval-row span{white-space:nowrap}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
     </style></head><body>${pages}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));</script></body></html>`);
     w.document.close();w.focus();
   }catch(e){toast(e.message||'Gagal menjana surat kebenaran.');}
@@ -864,4 +891,103 @@ function renderAktivitiPesertaTable_(){
 async function saveAktivitiPeserta(){
   const id=String(state.currentActivityId||'');if(!id)return;const selected=AKTIVITI_PESERTA_STATE.rows.filter(r=>r.selected).map(r=>({NO_KP:r.NO_KP,PERANAN:r.peranan||'PESERTA'}));const b=$('activityParticipantsSaveBtn');if(b){b.disabled=true;b.textContent='Menyimpan...';}
   try{const d=await apiGet('saveAktivitiPeserta',{token:state.token,aktivitiId:id,peserta:JSON.stringify(selected)});toast(d.message||'Peserta berjaya disimpan.');await loadAktivitiPesertaPage();}catch(e){toast(e.message||'Gagal menyimpan peserta.');}finally{if(b){b.disabled=false;b.textContent='Simpan Peserta';}}
+}
+
+
+/* =========================================================
+   RICH TEXT EDITOR — PATCH V2.6
+   Simpan metadata/kandungan melalui Apps Script; print-to-PDF
+   dilakukan melalui dialog cetak pelayar.
+========================================================= */
+let EDITOR_DOCUMENT_ID = '';
+function editorEl_(){return $('docEditor');}
+function newEditorDocument_(){
+  EDITOR_DOCUMENT_ID='';
+  if($('docTitle'))$('docTitle').value='';
+  if($('docType'))$('docType').value='LAPORAN';
+  if(editorEl_())editorEl_.innerHTML='<h2>TAJUK DOKUMEN</h2><p>Taip kandungan dokumen di sini...</p>';
+  if($('docEditorStatus'))$('docEditorStatus').textContent='Dokumen baharu belum disimpan.';
+  editorEl_()?.focus();
+}
+function runEditorCommand_(cmd){
+  const ed=editorEl_();if(!ed)return;
+  ed.focus();
+  try{document.execCommand(cmd,false,null);}catch(e){toast('Arahan format tidak disokong pelayar.');}
+}
+function applyEditorBlockFormat_(){
+  const ed=editorEl_();if(!ed)return;
+  ed.focus();document.execCommand('formatBlock',false,$('editorBlockFormat')?.value||'p');
+}
+function applyEditorTextColor_(){
+  const ed=editorEl_();if(!ed)return;
+  ed.focus();document.execCommand('foreColor',false,$('editorTextColor')?.value||'#222222');
+}
+function insertEditorLink_(){
+  const url=prompt('Masukkan URL pautan (https://...)');if(!url)return;
+  if(!/^https?:\/\//i.test(url.trim()))return toast('Pautan mesti bermula dengan http:// atau https://');
+  editorEl_()?.focus();document.execCommand('createLink',false,url.trim());
+}
+function cleanEditorHtml_(html){
+  const t=document.createElement('template');t.innerHTML=String(html||'');
+  t.content.querySelectorAll('script,iframe,object,embed,form,button,input,textarea,select').forEach(n=>n.remove());
+  t.content.querySelectorAll('*').forEach(n=>{
+    [...n.attributes].forEach(a=>{
+      if(/^on/i.test(a.name)||a.name==='contenteditable')n.removeAttribute(a.name);
+      if(['href','src'].includes(a.name)&&/^\s*javascript:/i.test(a.value))n.removeAttribute(a.name);
+    });
+  });
+  return t.innerHTML;
+}
+async function saveEditorDocument_(){
+  if(!state.token)return toast('Sila log masuk semula.');
+  const title=String($('docTitle')?.value||'').trim();
+  const type=String($('docType')?.value||'LAIN');
+  const content=cleanEditorHtml_(editorEl_()?.innerHTML||'');
+  if(!title)return toast('Masukkan tajuk dokumen.');
+  if(!content.replace(/<[^>]*>/g,'').trim())return toast('Kandungan dokumen masih kosong.');
+  const b=$('docSaveBtn');if(b){b.disabled=true;b.textContent='Menyimpan...';}
+  try{
+    const d=await apiGet('saveDocument',{token:state.token,documentId:EDITOR_DOCUMENT_ID,title,type,content});
+    EDITOR_DOCUMENT_ID=d.documentId||EDITOR_DOCUMENT_ID;
+    if($('docEditorStatus'))$('docEditorStatus').textContent='Disimpan pada '+new Date().toLocaleString('ms-MY')+'.';
+    toast(d.message||'Dokumen berjaya disimpan.');
+    await loadSavedDocuments_();
+  }catch(e){toast(e.message||'Gagal menyimpan dokumen.');}
+  finally{if(b){b.disabled=false;b.textContent='Simpan Dokumen';}}
+}
+async function loadSavedDocuments_(){
+  const wrap=$('savedDocsWrap');if(!wrap)return;
+  try{
+    const d=await apiGet('getDocuments',{token:state.token});
+    const rows=d.data||[];
+    if(!rows.length){wrap.innerHTML='<div class="empty">Belum ada dokumen tersimpan.</div>';return;}
+    wrap.innerHTML='<table><thead><tr><th>TAJUK</th><th>JENIS</th><th>DIKEMAS KINI</th><th>TINDAKAN</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><td><b>${activityEsc_(r.TITLE||'Tanpa tajuk')}</b></td><td>${activityEsc_(r.TYPE||'-')}</td><td>${activityEsc_(r.UPDATED_AT||'-')}</td><td><button class="btn secondary small" type="button" data-doc-open="${activityEsc_(r.DOCUMENT_ID)}">Buka</button></td></tr>`).join('')+
+      '</tbody></table>';
+    wrap.querySelectorAll('[data-doc-open]').forEach(btn=>btn.addEventListener('click',()=>openSavedDocument_(btn.dataset.docOpen)));
+  }catch(e){wrap.innerHTML='<div class="empty">Tidak dapat memuatkan dokumen: '+activityEsc_(e.message||'Ralat')+'</div>';}
+}
+async function openSavedDocument_(id){
+  try{
+    const d=await apiGet('getDocument',{token:state.token,documentId:id});
+    const r=d.document||{};
+    EDITOR_DOCUMENT_ID=String(r.DOCUMENT_ID||'');
+    $('docTitle').value=r.TITLE||'';
+    $('docType').value=r.TYPE||'LAIN';
+    editorEl_().innerHTML=cleanEditorHtml_(r.CONTENT_HTML||'');
+    $('docEditorStatus').textContent='Dokumen dibuka. Perubahan belum disimpan.';
+    editorEl_().focus();
+  }catch(e){toast(e.message||'Gagal membuka dokumen.');}
+}
+function printEditorDocument_(){
+  const title=String($('docTitle')?.value||'Dokumen e-KOSSTA').trim();
+  const content=cleanEditorHtml_(editorEl_()?.innerHTML||'');
+  const w=window.open('','_blank');
+  if(!w)return toast('Popup disekat. Benarkan pop-up untuk eksport PDF.');
+  const safeTitle=activityEsc_(title);
+  w.document.open();
+  w.document.write(`<!doctype html><html lang="ms"><head><meta charset="utf-8"><title>${safeTitle}</title><style>
+  @page{size:A4;margin:20mm}*{box-sizing:border-box}body{font:11pt/1.55 Arial,sans-serif;color:#111;background:#fff}h1{font-size:20pt}h2{font-size:16pt}h3{font-size:13pt}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:6px;vertical-align:top}img{max-width:100%}a{color:#111;text-decoration:underline}ul,ol{padding-left:24px}blockquote{margin-left:20px;border-left:3px solid #bbb;padding-left:12px}
+  </style></head><body>${content}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));</script></body></html>`);
+  w.document.close();w.focus();
 }
