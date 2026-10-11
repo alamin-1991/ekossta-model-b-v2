@@ -1,4 +1,4 @@
-const CACHE = 'ekossta-model-b-v2-6-rich-editor-20261011';
+const CACHE = 'ekossta-model-b-v2-6-a4-editor-20261011';
 const SHELL = [
   './',
   './index.html',

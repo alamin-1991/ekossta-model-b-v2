@@ -752,8 +752,30 @@ html.dark-mode-active .attendance-kpi{background:var(--surface2)}
 @media(max-width:700px){.editor-heading{flex-direction:column}.editor-heading-actions{width:100%}.editor-heading-actions .btn{flex:1}.editor-meta-grid{grid-template-columns:1fr}.editor-toolbar{gap:4px}.editor-toolbar button{padding:6px 8px}.rich-editor{min-height:420px;padding:18px}.editor-footer{align-items:stretch}.editor-footer>div{width:100%}.editor-footer>div .btn{flex:1}.approval-row{flex-direction:column;gap:8px}}
 
 
-/* PATCH FIX: template tables stay visible and editable in Rich Text Editor */
-#docEditor table{width:100%!important;border-collapse:collapse!important;margin:12px 0 16px!important;background:#fff!important;color:#222!important}
-#docEditor th,#docEditor td{border:1px solid #777!important;padding:7px!important;text-align:left!important;vertical-align:top!important;background:#fff!important;color:#222!important}
-#docEditor th{font-weight:700!important;width:28%}
-#docEditor p{overflow-wrap:anywhere}
+/* V2.6 A4 CANVAS: editor page dimensions match printed A4 */
+.rich-editor{
+  width:210mm;
+  min-width:210mm;
+  max-width:210mm;
+  min-height:297mm;
+  margin:0 auto;
+  padding:20mm;
+  border-radius:0;
+  background:#fff;
+  color:#111;
+  box-shadow:0 2px 18px rgba(0,0,0,.14);
+  overflow-wrap:anywhere;
+}
+#reportsSection .editor-page-wrap{
+  width:100%;
+  overflow:auto;
+  padding:18px 12px;
+  background:#e8ebf0;
+  border-radius:0 0 14px 14px;
+}
+@media(max-width:800px){
+  .rich-editor{margin:0}
+}
+@media print{
+  .rich-editor{box-shadow:none;margin:0}
+}
