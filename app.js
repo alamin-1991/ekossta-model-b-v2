@@ -321,6 +321,7 @@ function init(){
   bind('activityParticipantsBackBtn','click',()=>showPage('activity'));
   bind('activityParticipantsSaveBtn','click',saveAktivitiPeserta);
   bind('docNewBtn','click',newEditorDocument_);
+  bind('docLoadLetterTemplateBtn','click',loadPermissionTemplateIntoEditor_);
   bind('docListRefreshBtn','click',loadSavedDocuments_);
   bind('docSaveBtn','click',saveEditorDocument_);
   bind('docPrintBtn','click',printEditorDocument_);
@@ -652,45 +653,27 @@ async function openAktivitiPermissionLetter(activityId){
     const schoolName='SMK TENGKU TEMENGGONG AHMAD';
     const date=activityDate_(a.TARIKH)||'-';
     const safe=v=>activityEsc_(v||'-');
-    const pages=peserta.map((p,i)=>`<section class="permission-page">
-      <div class="letter-header">
-        <div class="school-name">${safe(schoolName)}</div>
-        <div class="school-sub">SURAT AKUAN KEBENARAN WARIS MENYERTAI AKTIVITI KOKURIKULUM</div>
-      </div>
-      <p>Saya <span class="line"></span> No. Kad Pengenalan: <span class="line short"></span></p>
-      <p>Beralamat di <span class="line long"></span></p>
-      <p>No. Telefon: <span class="line short"></span></p>
-      <p>mengaku adalah waris kepada murid bernama di bawah:</p>
-      <table class="letter-table"><tr><th>Nama Murid</th><td>${safe(p.NAMA)}</td></tr><tr><th>No. Kad Pengenalan</th><td>${safe(p.NO_KP)}</td></tr><tr><th>Kelas</th><td>${safe(p.KELAS)}</td></tr><tr><th>Sekolah</th><td>${safe(schoolName)}</td></tr></table>
-      <p>Saya dengan ini memberi kebenaran bertulis saya kepada anak / jagaan saya untuk menyertai:</p>
-      <table class="letter-table"><tr><th>Program</th><td>${safe(a.NAMA_AKTIVITI)}</td></tr><tr><th>Tarikh</th><td>${safe(date)}</td></tr><tr><th>Masa</th><td>${safe(a.MASA)}</td></tr><tr><th>Peringkat</th><td>${safe(a.PERINGKAT)}</td></tr><tr><th>Tempat</th><td>${safe(a.TEMPAT)}</td></tr></table>
-      <p>2. Saya difahamkan bahawa soal keselamatan dan disiplin sentiasa diberi perhatian sewajarnya oleh Guru / Pegawai / Urusetia yang telah diamanahkan. Sekiranya kesihatan anak / jagaan saya terganggu dalam masa latihan, program atau perjalanan, maka saya dengan sepenuh hati membenarkan Guru / Pegawai / Urusetia menguruskan bagi pihak saya untuk mendapatkan rawatan perubatan.</p>
-      <p>3. Saya dengan ini mengakui bahawa pelajar di atas <b>ADA / TIDAK ADA*</b> mengidap penyakit kronik / berjangkit. Nyatakan (jika ada): <span class="line long"></span></p>
-      <div class="signature-block">
-        <p>....................................................................................</p>
-        <p><b>Tandatangan Ibu Bapa/Penjaga*</b></p>
-        <p>Nama&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
-        <p>Tarikh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
-      </div>
-      <div class="witness-block">
-        <p class="section-label"><b>PENGAKUAN SAKSI</b></p>
-        <p>Saya dengan ini memperakukan bahawa sepanjang pengetahuan saya, segala keterangan di atas adalah benar.</p>
-        <p class="signature-dots">....................................................................................</p>
-        <p><b>Tandatangan Saksi/Guru pengiring*</b></p>
-        <p>Nama&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
-        <p>Tarikh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; ............................................................</p>
-      </div>
-      <div class="approval">
-        <p class="signature-dots">............................................................</p>
-        <p><b>Disahkan oleh Pengetua</b></p>
-        <div class="approval-row"><span>Cop Rasmi&nbsp;&nbsp;&nbsp;&nbsp;:</span><span>Tarikh: ....................................</span></div>
-        <p>/ Guru Besar / Cop rasmi</p>
-      </div>
-      <div class="page-no">Surat ${i+1} daripada ${peserta.length}</div>
-    </section>`).join('');
+    let permissionTemplate=defaultPermissionTemplate_();
+    try{
+      const saved=await apiGet('getDocuments',{token:state.token});
+      const found=(saved.data||[]).find(r=>String(r.TYPE)==='SURAT_KEBENARAN'&&/templat surat kebenaran ibu bapa/i.test(String(r.TITLE||'')));
+      if(found){
+        const full=await apiGet('getDocument',{token:state.token,documentId:found.DOCUMENT_ID});
+        if(full.document?.CONTENT_HTML)permissionTemplate=full.document.CONTENT_HTML;
+      }
+    }catch(e){console.warn('Templat tersimpan tidak dapat dimuatkan; menggunakan templat asal.',e);}
+    const pages=peserta.map((p,i)=>{
+      const values={
+        NAMA_MURID:safe(p.NAMA),NO_KP_MURID:safe(p.NO_KP),KELAS_MURID:safe(p.KELAS),
+        NAMA_AKTIVITI:safe(a.NAMA_AKTIVITI),TARIKH_AKTIVITI:safe(date),MASA_AKTIVITI:safe(a.MASA),
+        PERINGKAT_AKTIVITI:safe(a.PERINGKAT),TEMPAT_AKTIVITI:safe(a.TEMPAT)
+      };
+      const body=replaceLetterTokens_(permissionTemplate,values);
+      return `<section class="permission-page">${body}<div class="page-no">Surat ${i+1} daripada ${peserta.length}</div></section>`;
+    }).join('');
     w.document.open();
     w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Surat Kebenaran - ${safe(nama)}</title><style>
-      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}.letter-table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px}.letter-table th,.letter-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}.letter-table th{width:28%;font-weight:700}.line{display:inline-block;min-width:180px;border-bottom:1px solid #555;height:14px}.line.short{min-width:120px}.line.long{display:block;width:100%;margin-top:4px}.signature-block,.witness-block,.approval{margin-top:18px;font-size:11px;line-height:1.45}.signature-block p,.witness-block p,.approval p{margin:5px 0}.witness-block{margin-top:22px}.section-label{margin-top:0!important}.signature-dots{margin-top:30px!important}.approval{margin-top:28px}.approval-row{display:flex;justify-content:space-between;gap:18px;margin-top:8px}.approval-row span{white-space:nowrap}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
+      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}.letter-table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px}.letter-table th,.letter-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}.letter-table th{width:28%;font-weight:700}.line{display:inline-block;min-width:0;border:0;height:auto}.line.short,.line.long{min-width:0;width:auto;border:0}.signature-block,.witness-block,.approval{margin-top:18px;font-size:11px;line-height:1.45}.signature-block p,.witness-block p,.approval p{margin:5px 0}.witness-block{margin-top:22px}.section-label{margin-top:0!important}.signature-dots{margin-top:30px!important}.approval{margin-top:28px}.approval-row{display:flex;justify-content:space-between;gap:18px;margin-top:8px}.approval-row span{white-space:nowrap}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
     </style></head><body>${pages}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));</script></body></html>`);
     w.document.close();w.focus();
   }catch(e){toast(e.message||'Gagal menjana surat kebenaran.');}
@@ -938,6 +921,60 @@ function cleanEditorHtml_(html){
   });
   return t.innerHTML;
 }
+
+function defaultPermissionTemplate_(){
+  return `<div style="font-family:Arial,sans-serif;color:#111">
+    <h2 style="text-align:center;margin:0">SMK TENGKU TEMENGGONG AHMAD</h2>
+    <h3 style="text-align:center;margin:8px 0 14px">SURAT AKUAN KEBENARAN WARIS MENYERTAI AKTIVITI KOKURIKULUM</h3>
+    <p>Saya .................................................... No. Kad Pengenalan: ....................................................</p>
+    <p>Beralamat di ............................................................................................................................</p>
+    <p>No. Telefon: ....................................................</p>
+    <p>mengaku adalah waris kepada murid bernama di bawah:</p>
+    <table><tbody><tr><th>Nama Murid</th><td>{{NAMA_MURID}}</td></tr><tr><th>No. Kad Pengenalan</th><td>{{NO_KP_MURID}}</td></tr><tr><th>Kelas</th><td>{{KELAS_MURID}}</td></tr><tr><th>Sekolah</th><td>SMK TENGKU TEMENGGONG AHMAD</td></tr></tbody></table>
+    <p>Saya dengan ini memberi kebenaran bertulis saya kepada anak / jagaan saya untuk menyertai:</p>
+    <table><tbody><tr><th>Program</th><td>{{NAMA_AKTIVITI}}</td></tr><tr><th>Tarikh</th><td>{{TARIKH_AKTIVITI}}</td></tr><tr><th>Masa</th><td>{{MASA_AKTIVITI}}</td></tr><tr><th>Peringkat</th><td>{{PERINGKAT_AKTIVITI}}</td></tr><tr><th>Tempat</th><td>{{TEMPAT_AKTIVITI}}</td></tr></tbody></table>
+    <p>2. Saya difahamkan bahawa soal keselamatan dan disiplin sentiasa diberi perhatian sewajarnya oleh Guru / Pegawai / Urusetia yang telah diamanahkan. Sekiranya kesihatan anak / jagaan saya terganggu dalam masa latihan, program atau perjalanan, maka saya dengan sepenuh hati membenarkan Guru / Pegawai / Urusetia menguruskan bagi pihak saya untuk mendapatkan rawatan perubatan.</p>
+    <p>3. Saya dengan ini mengakui bahawa pelajar di atas <b>ADA / TIDAK ADA*</b> mengidap penyakit kronik / berjangkit. Nyatakan (jika ada): .................................................... *(potong yang berkenaan)*</p>
+    <p>....................................................................................</p><p><b>Tandatangan Ibu Bapa/Penjaga*</b></p>
+    <p>Nama&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ............................................................</p><p>Tarikh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ............................................................</p>
+    <p><b>PENGAKUAN SAKSI</b></p>
+    <p>Saya dengan ini memperakukan bahawa sepanjang pengetahuan saya, segala keterangan di atas adalah benar.</p>
+    <p style="margin-top:30px">....................................................................................</p><p><b>Tandatangan Saksi/Guru pengiring*</b></p>
+    <p>Nama&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ............................................................</p><p>Tarikh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ............................................................</p>
+    <p style="margin-top:28px">............................................................</p><p><b>Disahkan oleh Pengetua</b></p>
+    <p>Cop Rasmi&nbsp;&nbsp;&nbsp;&nbsp;: <span style="display:inline-block;width:150px"></span> Tarikh: ....................................</p>
+    <p>/ Guru Besar / Cop rasmi</p>
+  </div>`;
+}
+async function loadPermissionTemplateIntoEditor_(){
+  let html=defaultPermissionTemplate_(),docId='';
+  try{
+    const d=await apiGet('getDocuments',{token:state.token});
+    const found=(d.data||[]).find(r=>String(r.TYPE)==='SURAT_KEBENARAN'&&/templat surat kebenaran ibu bapa/i.test(String(r.TITLE||'')));
+    if(found){
+      const full=await apiGet('getDocument',{token:state.token,documentId:found.DOCUMENT_ID});
+      html=full.document?.CONTENT_HTML||html;docId=full.document?.DOCUMENT_ID||'';
+    }
+  }catch(e){/* templat asal terbina dalam masih boleh digunakan */}
+  EDITOR_DOCUMENT_ID=docId;
+  $('docTitle').value='Templat Surat Kebenaran Ibu Bapa';
+  $('docType').value='SURAT_KEBENARAN';
+  editorEl_().innerHTML=cleanEditorHtml_(html);
+  $('docEditorStatus').textContent=docId?'Templat tersimpan dimuatkan. Edit dan tekan Simpan Dokumen.':'Templat asal dimuatkan. Edit dan tekan Simpan Dokumen untuk menyimpan perubahan.';
+  editorEl_().focus();
+}
+function replaceLetterTokens_(template, values){
+  let out=String(template||'');
+  Object.keys(values).forEach(k=>{
+    const safe=String(values[k]??'-');
+    out=out.replace(new RegExp('{{'+k+'}}','g'),safe);
+  });
+  // Keep template text editable and replace any remaining generated CSS lines with dotted text.
+  out=out.replace(/<span class=["']line(?:\s+[^"']*)?["']><\/span>/gi,'....................................................');
+  out=out.replace(/<hr\b[^>]*>/gi,'<p>....................................................................................</p>');
+  return out;
+}
+
 async function saveEditorDocument_(){
   if(!state.token)return toast('Sila log masuk semula.');
   const title=String($('docTitle')?.value||'').trim();
