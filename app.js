@@ -673,7 +673,7 @@ async function openAktivitiPermissionLetter(activityId){
     }).join('');
     w.document.open();
     w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Surat Kebenaran - ${safe(nama)}</title><style>
-      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}.letter-table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px}.letter-table th,.letter-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}.letter-table th{width:28%;font-weight:700}.line{display:inline-block;min-width:0;border:0;height:auto}.line.short,.line.long{min-width:0;width:auto;border:0}.signature-block,.witness-block,.approval{margin-top:18px;font-size:11px;line-height:1.45}.signature-block p,.witness-block p,.approval p{margin:5px 0}.witness-block{margin-top:22px}.section-label{margin-top:0!important}.signature-dots{margin-top:30px!important}.approval{margin-top:28px}.approval-row{display:flex;justify-content:space-between;gap:18px;margin-top:8px}.approval-row span{white-space:nowrap}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
+      @page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.permission-page{width:100%;min-height:273mm;padding:4mm 2mm;page-break-after:always;position:relative}.permission-page:last-child{page-break-after:auto}.letter-header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.school-name{font-size:18px;font-weight:800}.school-sub{font-size:13px;font-weight:800;margin-top:8px}.permission-page p{font-size:11.5px;line-height:1.55;margin:9px 0}table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px;page-break-inside:avoid}table th,table td{border:1px solid #777!important;padding:7px;text-align:left;vertical-align:top;background:#fff!important;color:#111!important}table th{width:28%;font-weight:700}table tr{page-break-inside:avoid}table{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:11px;page-break-inside:avoid}table th,table td{border:1px solid #777!important;padding:7px;text-align:left;vertical-align:top;background:#fff!important;color:#111!important}table th{width:28%;font-weight:700}table tr{page-break-inside:avoid}.line{display:inline-block;min-width:0;border:0;height:auto}.line.short,.line.long{min-width:0;width:auto;border:0}.signature-block,.witness-block,.approval{margin-top:18px;font-size:11px;line-height:1.45}.signature-block p,.witness-block p,.approval p{margin:5px 0}.witness-block{margin-top:22px}.section-label{margin-top:0!important}.signature-dots{margin-top:30px!important}.approval{margin-top:28px}.approval-row{display:flex;justify-content:space-between;gap:18px;margin-top:8px}.approval-row span{white-space:nowrap}.page-no{position:absolute;bottom:2mm;right:2mm;font-size:8px;color:#666}@media print{.permission-page{page-break-after:always}.permission-page:last-child{page-break-after:auto}}@media screen{body{background:#e5e7eb;padding:20px}.permission-page{background:#fff;max-width:794px;margin:0 auto 20px;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
     </style></head><body>${pages}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));</script></body></html>`);
     w.document.close();w.focus();
   }catch(e){toast(e.message||'Gagal menjana surat kebenaran.');}
@@ -959,19 +959,28 @@ async function loadPermissionTemplateIntoEditor_(){
   EDITOR_DOCUMENT_ID=docId;
   $('docTitle').value='Templat Surat Kebenaran Ibu Bapa';
   $('docType').value='SURAT_KEBENARAN';
-  editorEl_().innerHTML=cleanEditorHtml_(html);
+  editorEl_().innerHTML=cleanEditorHtml_(normalizePermissionTemplate_(html));
   $('docEditorStatus').textContent=docId?'Templat tersimpan dimuatkan. Edit dan tekan Simpan Dokumen.':'Templat asal dimuatkan. Edit dan tekan Simpan Dokumen untuk menyimpan perubahan.';
   editorEl_().focus();
 }
-function replaceLetterTokens_(template, values){
+function normalizePermissionTemplate_(template){
   let out=String(template||'');
+  // Tukar elemen garisan lama kepada teks titik, termasuk template lama yang menggunakan .line / border-bottom / HR.
+  out=out.replace(/<hr\b[^>]*>/gi,'<p>....................................................................................</p>');
+  out=out.replace(/<(span|div|p)\b([^>]*(?:class\s*=\s*["'][^"']*\bline\b[^"']*["']|style\s*=\s*["'][^"']*border-bottom\s*:[^"']*["'])[^>]*)>\s*<\/\1>/gi,'<span>............................................................</span>');
+  out=out.replace(/<span\b([^>]*(?:class\s*=\s*["'][^"']*\bline\b[^"']*["']|style\s*=\s*["'][^"']*border-bottom\s*:[^"']*["'])[^>]*)>\s*<\/span>/gi,'<span>............................................................</span>');
+  // Buang gaya latar gelap/warna teks lama daripada sel jadual; jadual kekal boleh diedit.
+  out=out.replace(/\sstyle=(["'])[^"']*(?:background(?:-color)?\s*:\s*(?:#(?:1[0-9a-f]{5}|2[0-9a-f]{5}|3[0-9a-f]{5})|rgb\([^)]*\))|color\s*:\s*#(?:fff|ffffff|f5f5f8))[^"']*\1/gi,'');
+  return out;
+}
+function replaceLetterTokens_(template, values){
+  let out=normalizePermissionTemplate_(template);
   Object.keys(values).forEach(k=>{
     const safe=String(values[k]??'-');
-    out=out.replace(new RegExp('{{'+k+'}}','g'),safe);
+    out=out.replace(new RegExp('{{\\s*'+k+'\\s*}}','g'),safe);
   });
-  // Keep template text editable and replace any remaining generated CSS lines with dotted text.
+  // Keserasian dengan templat terdahulu.
   out=out.replace(/<span class=["']line(?:\s+[^"']*)?["']><\/span>/gi,'....................................................');
-  out=out.replace(/<hr\b[^>]*>/gi,'<p>....................................................................................</p>');
   return out;
 }
 
